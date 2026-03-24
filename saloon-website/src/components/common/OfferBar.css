@@ -1,0 +1,11 @@
+.offer-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--primary);
+  color: #fff;
+  text-align: center;
+  padding: 8px 12px;
+  font-size: 14px;
+  letter-spacing: 0.4px;
+}

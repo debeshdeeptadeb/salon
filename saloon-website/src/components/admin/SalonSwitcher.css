@@ -1,0 +1,63 @@
+.salon-switcher {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 28px;
+    background: linear-gradient(105deg, #1e293b 0%, #0f172a 50%, #1e1b4b 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-wrap: wrap;
+}
+
+.salon-switcher-building {
+    color: #c9a24d;
+    flex-shrink: 0;
+}
+
+.salon-switcher-label {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+}
+
+.salon-switcher-select-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-width: 240px;
+}
+
+.salon-switcher-select {
+    width: 100%;
+    min-width: 220px;
+    padding: 10px 36px 10px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.07);
+    color: #f8fafc;
+    font-size: 0.9rem;
+    font-weight: 500;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.salon-switcher-select:hover,
+.salon-switcher-select:focus {
+    outline: none;
+    border-color: rgba(201, 162, 77, 0.45);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.salon-switcher-chevron {
+    position: absolute;
+    right: 12px;
+    pointer-events: none;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.salon-switcher-select option {
+    color: #111;
+    background: #fff;
+}

@@ -1,0 +1,422 @@
+/* ============================================
+   MINJAL SALON - GLOBAL STYLES
+   Base Styles & Resets
+   ============================================ */
+
+/* Import Design Tokens */
+@import './variables.css';
+
+/* Import Premium Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap');
+
+/* ========== RESET & BASE ========== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-normal);
+  line-height: var(--leading-normal);
+  color: var(--color-navy-deep);
+  background-color: var(--color-white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ========== TYPOGRAPHY ========== */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: var(--font-bold);
+  line-height: var(--leading-tight);
+  color: var(--color-navy-deep);
+  margin-bottom: var(--space-md);
+}
+
+h1 {
+  font-size: clamp(2.5rem, 5vw, var(--text-6xl));
+  font-weight: var(--font-black);
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: clamp(2rem, 4vw, var(--text-5xl));
+  font-weight: var(--font-bold);
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: clamp(1.5rem, 3vw, var(--text-4xl));
+  font-weight: var(--font-semibold);
+}
+
+h4 {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-semibold);
+}
+
+h5 {
+  font-size: var(--text-xl);
+  font-weight: var(--font-medium);
+}
+
+h6 {
+  font-size: var(--text-lg);
+  font-weight: var(--font-medium);
+}
+
+p {
+  margin-bottom: var(--space-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-gray-dark);
+}
+
+a {
+  color: var(--color-gold-champagne);
+  text-decoration: none;
+  transition: color var(--duration-normal) var(--ease-smooth);
+}
+
+a:hover {
+  color: var(--color-gold-shimmer);
+}
+
+strong,
+b {
+  font-weight: var(--font-semibold);
+}
+
+em,
+i {
+  font-style: italic;
+}
+
+/* ========== UTILITY CLASSES ========== */
+
+/* Text Alignment */
+.text-left {
+  text-align: left;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* Text Colors */
+.text-gold {
+  color: var(--color-gold-champagne);
+}
+
+.text-navy {
+  color: var(--color-navy-deep);
+}
+
+.text-white {
+  color: var(--color-white);
+}
+
+.text-gray {
+  color: var(--color-gray-dark);
+}
+
+/* Font Families */
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+.font-accent {
+  font-family: var(--font-accent);
+}
+
+/* Font Weights */
+.font-light {
+  font-weight: var(--font-light);
+}
+
+.font-normal {
+  font-weight: var(--font-normal);
+}
+
+.font-medium {
+  font-weight: var(--font-medium);
+}
+
+.font-semibold {
+  font-weight: var(--font-semibold);
+}
+
+.font-bold {
+  font-weight: var(--font-bold);
+}
+
+/* Spacing */
+.mt-auto {
+  margin-top: auto;
+}
+
+.mb-auto {
+  margin-bottom: auto;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-lg);
+  padding-right: var(--space-lg);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding-left: var(--space-sm);
+    padding-right: var(--space-sm);
+  }
+}
+
+/* Section Spacing */
+.section {
+  padding-top: var(--space-3xl);
+  padding-bottom: var(--space-3xl);
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-2xl);
+  }
+}
+
+/* ========== ANIMATIONS ========== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn var(--duration-slow) var(--ease-smooth);
+}
+
+.fade-in-up {
+  animation: fadeInUp var(--duration-slow) var(--ease-smooth);
+}
+
+.slide-in-left {
+  animation: slideInLeft var(--duration-slow) var(--ease-smooth);
+}
+
+.slide-in-right {
+  animation: slideInRight var(--duration-slow) var(--ease-smooth);
+}
+
+.scale-in {
+  animation: scaleIn var(--duration-normal) var(--ease-bounce);
+}
+
+/* ========== SCROLLBAR STYLING ========== */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-gray-soft);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gradient-gold);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold-champagne);
+}
+
+/* ========== SELECTION ========== */
+
+::selection {
+  background-color: var(--color-gold-champagne);
+  color: var(--color-white);
+}
+
+::-moz-selection {
+  background-color: var(--color-gold-champagne);
+  color: var(--color-white);
+}
+
+/* ========== FOCUS STYLES ========== */
+
+:focus-visible {
+  outline: 2px solid var(--color-gold-champagne);
+  outline-offset: 2px;
+}
+
+/* ========== IMAGES ========== */
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ========== BUTTONS BASE ========== */
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ========== INPUTS BASE ========== */
+
+input,
+textarea,
+select {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  border: 1px solid var(--color-gray-medium);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-gold-champagne);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+/* ========== RESPONSIVE UTILITIES ========== */
+
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}

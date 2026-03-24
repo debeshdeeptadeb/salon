@@ -1,0 +1,412 @@
+/**
+ * Shared admin UI: alignment, tables, section headers, stats.
+ * Import from Dashboard.jsx (wraps all admin routes).
+ */
+
+.admin-ui-page {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.admin-page-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--dark, #1a1a1a);
+}
+
+.admin-page-title-row svg {
+    flex-shrink: 0;
+    color: var(--primary, #701a1a);
+    opacity: 0.95;
+}
+
+.admin-ui-header {
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border-light, #e2e8f0);
+}
+
+.admin-ui-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--dark, #1a1a1a);
+    letter-spacing: -0.02em;
+    margin: 0 0 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.admin-ui-header .page-description,
+.admin-ui-subtitle {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text-medium, #4a5568);
+    line-height: 1.5;
+}
+
+/* Section titles with optional icon */
+.admin-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-dark, #2d3748);
+    margin: 0 0 1rem;
+}
+
+.admin-section-title svg {
+    flex-shrink: 0;
+    color: var(--primary, #701a1a);
+    opacity: 0.9;
+}
+
+/* Tables: consistent alignment */
+.admin-table-pro,
+.bookings-table,
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+.admin-table-pro th,
+.admin-table-pro td,
+.bookings-table th,
+.bookings-table td,
+.admin-table th,
+.admin-table td {
+    vertical-align: middle;
+}
+
+.admin-table-pro th,
+.bookings-table th,
+.admin-table th {
+    white-space: nowrap;
+}
+
+.admin-table-pro td,
+.bookings-table td,
+.admin-table td {
+    word-break: break-word;
+}
+
+/* Stat / icon wrappers */
+.admin-stat-ico {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 12px;
+    flex-shrink: 0;
+    background: rgba(112, 26, 26, 0.08);
+    color: var(--primary, #701a1a);
+}
+
+.admin-stat-ico svg {
+    width: 1.35rem;
+    height: 1.35rem;
+}
+
+.stat-card .admin-stat-ico {
+    width: 3rem;
+    height: 3rem;
+}
+
+.stat-card .admin-stat-ico svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+/* Empty states */
+.admin-empty-illustration {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #94a3b8;
+}
+
+.admin-empty-illustration svg {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* Filter tabs (enquiries) */
+.admin-filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding: 0.25rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid var(--border-light, #e2e8f0);
+}
+
+.admin-filter-tabs button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1.1rem;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-medium, #4a5568);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.admin-filter-tabs button svg {
+    flex-shrink: 0;
+    opacity: 0.9;
+    margin-right: 0.35rem;
+}
+
+.admin-filter-tabs button:hover {
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--dark, #1a1a1a);
+}
+
+.admin-filter-tabs button.active {
+    background: #fff;
+    color: var(--primary, #701a1a);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Icon buttons in tables */
+.admin-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    background: transparent;
+    color: inherit;
+}
+
+.admin-icon-btn:hover {
+    transform: translateY(-1px);
+}
+
+.admin-icon-btn--danger {
+    color: #ef4444;
+    background: #fef2f2;
+}
+
+.admin-icon-btn--danger:hover {
+    background: #fee2e2;
+}
+
+.admin-icon-btn--success {
+    color: #16a34a;
+    background: #f0fdf4;
+}
+
+.admin-btn-with-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-featured-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.admin-muted-dash {
+    color: #cbd5e1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dashboard home */
+.dashboard-welcome {
+    margin-top: 2rem;
+    padding: 1.75rem;
+    background: linear-gradient(135deg, #faf8f5 0%, #f8fafc 100%);
+    border-radius: 16px;
+    border: 1px solid var(--border-light, #e2e8f0);
+}
+
+.dashboard-welcome h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    color: var(--dark, #1a1a1a);
+}
+
+.dashboard-welcome > p {
+    margin: 0 0 1rem;
+    color: var(--text-medium, #4a5568);
+    font-size: 0.95rem;
+}
+
+.dashboard-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dashboard-checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.45rem 0;
+    font-size: 0.92rem;
+    color: var(--text-dark, #2d3748);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dashboard-checklist li:last-child {
+    border-bottom: none;
+}
+
+.dashboard-checklist-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: #16a34a;
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.dashboard-stats .stat-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem 1.35rem;
+    background: #fff;
+    border: 1px solid var(--border-light, #e2e8f0);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.2s, border-color 0.2s;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.dashboard-stats .stat-card:hover {
+    border-color: rgba(112, 26, 26, 0.25);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.dashboard-stats .stat-card .stat-icon {
+    flex-shrink: 0;
+}
+
+.dashboard-stats .stat-info h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.35rem;
+    color: var(--dark, #1a1a1a);
+}
+
+.dashboard-stats .stat-info .stat-number {
+    font-size: 0.875rem;
+    color: var(--text-medium, #4a5568);
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Mobile / small screens — Services, Offers, Bookings tables & toolbars       */
+/* -------------------------------------------------------------------------- */
+
+.admin-ui-header--split {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.admin-ui-header--split > div:first-child {
+    flex: 1;
+    min-width: min(100%, 200px);
+}
+
+/**
+ * Horizontal scroll for wide tables — use on a wrapper around <table>.
+ * Keeps page width within the viewport; table scrolls inside.
+ */
+.admin-table-scroll,
+.bookings-table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    border-radius: 12px;
+    border: 1px solid var(--border-light, #e2e8f0);
+    background: #fff;
+}
+
+.admin-table-scroll > table,
+.bookings-table-wrapper > table {
+    margin-top: 0;
+}
+
+.admin-table-scroll .admin-table {
+    margin-top: 0;
+}
+
+.services-management .admin-table-scroll .admin-table {
+    min-width: 880px;
+}
+
+.offers-management .admin-table-scroll .admin-table {
+    min-width: 720px;
+}
+
+@media (max-width: 768px) {
+    .admin-page-title-row {
+        font-size: 1.35rem;
+    }
+
+    .admin-ui-header h1 {
+        font-size: 1.35rem;
+        flex-wrap: wrap;
+    }
+
+    .admin-ui-header--split .admin-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 640px) {
+    .admin-ui-header--split {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

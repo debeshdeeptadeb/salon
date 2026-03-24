@@ -1,0 +1,158 @@
+.coming-soon-badge {
+    background: linear-gradient(135deg, #FFA726 0%, #FB8C00 100%);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.feature-preview {
+    max-width: 800px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.preview-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    animation: float 3s ease-in-out infinite;
+    color: var(--primary, #701a1a);
+}
+
+.preview-icon svg {
+    width: 4.5rem;
+    height: 4.5rem;
+}
+
+.feature-preview h2 {
+    font-size: 2rem;
+    color: var(--dark);
+    margin-bottom: 15px;
+}
+
+.feature-preview>p {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 40px;
+}
+
+.features-list {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.features-list h3 {
+    color: var(--dark);
+    margin-bottom: 20px;
+}
+
+.features-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.features-list li {
+    padding: 10px 0;
+    font-size: 1.05rem;
+    color: #555;
+}
+
+.feature-li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+}
+
+.feature-li-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    margin-top: 3px;
+}
+
+.feature-li-icon svg {
+    width: 1.15rem;
+    height: 1.15rem;
+}
+
+.feature-li-icon--done {
+    color: #16a34a;
+}
+
+.feature-li-icon--todo {
+    color: #94a3b8;
+}
+
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+.architecture-note {
+    background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    padding: 30px;
+    border-radius: 16px;
+    text-align: left;
+}
+
+.architecture-note h4 {
+    color: var(--dark);
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+.architecture-note p {
+    color: #555;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.architecture-note ul {
+    list-style: none;
+    padding-left: 20px;
+}
+
+.architecture-note li {
+    padding: 8px 0;
+    color: #555;
+}
+
+.architecture-note strong {
+    color: var(--primary);
+}
+
+.razorpay-info {
+    margin-top: 30px;
+    padding: 22px 24px;
+    background: #fffbeb;
+    border-radius: 12px;
+    border: 1px solid #fde68a;
+    text-align: left;
+}
+
+.razorpay-info h4 {
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    color: var(--dark);
+}
+
+.razorpay-info p,
+.razorpay-info li {
+    color: #57534e;
+    line-height: 1.55;
+}
+
+.razorpay-info ul {
+    margin: 0;
+    padding-left: 1.25rem;
+}

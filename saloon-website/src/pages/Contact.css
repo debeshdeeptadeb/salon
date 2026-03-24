@@ -1,0 +1,256 @@
+/* ============================================
+   MINJAL SALON - CONTACT PAGE
+   Luxury Contact Page
+   ============================================ */
+
+/* ========== CONTACT GRID ========== */
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: var(--space-3xl);
+    align-items: start;
+}
+
+/* ========== CONTACT INFO ========== */
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.info-card {
+    padding: var(--space-xl);
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.info-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 70px;
+    background: var(--gradient-gold);
+    border-radius: var(--radius-full);
+    color: var(--color-navy-deep);
+    margin-bottom: var(--space-md);
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.info-card:hover .info-icon {
+    transform: scale(1.1);
+}
+
+.info-card h3 {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--color-navy-deep);
+    margin-bottom: var(--space-sm);
+}
+
+.info-card p {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-gray-dark);
+    line-height: var(--leading-relaxed);
+    margin: 0;
+}
+
+.contact-link {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: var(--font-medium);
+    color: var(--color-gold-champagne);
+    transition: color var(--duration-normal) var(--ease-smooth);
+}
+
+.contact-link:hover {
+    color: var(--color-gold-shimmer);
+}
+
+/* ========== CONTACT FORM ========== */
+.contact-form-wrapper {
+    padding: var(--space-2xl);
+    background: var(--color-white);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-lg);
+}
+
+.contact-form-wrapper h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    font-weight: var(--font-bold);
+    color: var(--color-navy-deep);
+    margin-bottom: var(--space-sm);
+}
+
+.form-description {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-gray-dark);
+    margin-bottom: var(--space-xl);
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.form-group label {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-navy-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: var(--space-md);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-navy-deep);
+    background: var(--color-gray-soft);
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    background: var(--color-white);
+    border-color: var(--color-gold-champagne);
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.submit-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: var(--space-md);
+}
+
+.spinner-icon {
+    animation: spin 1s linear infinite;
+}
+
+/* ========== MAP SECTION ========== */
+.map-section {
+    padding: var(--space-3xl) 0;
+    background: var(--color-cream);
+}
+
+.map-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-4xl);
+    font-weight: var(--font-bold);
+    color: var(--color-navy-deep);
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.map-wrapper {
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-2xl);
+}
+
+.map-wrapper iframe {
+    display: block;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1024px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-2xl);
+    }
+
+    .contact-info {
+        grid-template-columns: repeat(2, 1fr);
+        display: grid;
+    }
+}
+
+@media (max-width: 768px) {
+    .contact-info {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-form-wrapper {
+        padding: var(--space-xl);
+    }
+
+    .contact-form-wrapper h2 {
+        font-size: var(--text-2xl);
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+
+    .map-title {
+        font-size: var(--text-3xl);
+    }
+
+    .map-wrapper iframe {
+        height: 400px;
+    }
+}
+
+@media (max-width: 640px) {
+    .info-card {
+        padding: var(--space-lg);
+    }
+
+    .info-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .info-card h3 {
+        font-size: var(--text-lg);
+    }
+
+    .contact-form-wrapper {
+        padding: var(--space-lg);
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: var(--space-sm);
+    }
+
+    .map-wrapper iframe {
+        height: 350px;
+    }
+}

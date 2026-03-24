@@ -1,0 +1,373 @@
+/* QR Code Management Styles */
+
+.qr-management {
+    padding: 2rem;
+}
+
+.qr-info-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.info-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.95;
+}
+
+.qr-preview-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.info-content {
+    line-height: 1.6;
+}
+
+.info-content strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+/* QR Preview Card */
+.qr-preview-card {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.preview-header h3 {
+    color: #2d3748;
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.close-btn {
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #2d3748;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    background: rgba(0, 0, 0, 0.2);
+    transform: rotate(90deg);
+}
+
+.preview-content {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2rem;
+    align-items: center;
+}
+
+.qr-image-container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.qr-preview-image {
+    width: 250px;
+    height: 250px;
+    display: block;
+    border-radius: 8px;
+}
+
+.preview-details h4 {
+    font-size: 1.5rem;
+    color: #2d3748;
+    margin: 0 0 0.5rem 0;
+}
+
+.qr-id {
+    font-family: 'Courier New', monospace;
+    color: #718096;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.preview-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-download,
+.btn-print {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-download {
+    background: #48bb78;
+    color: white;
+}
+
+.btn-download:hover {
+    background: #38a169;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+}
+
+.btn-print {
+    background: #4299e1;
+    color: white;
+}
+
+.btn-print:hover {
+    background: #3182ce;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+}
+
+/* QR Grid */
+.qr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.qr-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+    position: relative;
+}
+
+.qr-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.qr-card.inactive {
+    opacity: 0.6;
+}
+
+.qr-card-image {
+    position: relative;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.qr-card-image img {
+    width: 200px;
+    height: 200px;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.inactive-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.qr-card-content {
+    padding: 1.5rem;
+}
+
+.qr-card-content h4 {
+    margin: 0 0 0.5rem 0;
+    color: #2d3748;
+    font-size: 1.1rem;
+}
+
+.qr-card-content .qr-id {
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.qr-date {
+    font-size: 0.85rem;
+    color: #718096;
+    margin-bottom: 1rem;
+}
+
+.qr-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn-icon {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #e2e8f0;
+    background: white;
+    border-radius: 6px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: #f7fafc;
+    transform: scale(1.05);
+}
+
+.btn-icon.active {
+    background: #48bb78;
+    color: white;
+    border-color: #48bb78;
+}
+
+.btn-icon.inactive {
+    background: #cbd5e0;
+    border-color: #cbd5e0;
+}
+
+.btn-icon.delete {
+    background: #fc8181;
+    color: white;
+    border-color: #fc8181;
+}
+
+.btn-icon.delete:hover {
+    background: #f56565;
+}
+
+/* Empty State */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #718096;
+}
+
+/* Modal Specific */
+.qr-modal {
+    max-width: 500px;
+}
+
+.qr-modal .form-group small {
+    display: block;
+    margin-top: 0.5rem;
+    color: #718096;
+    font-size: 0.85rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .qr-management {
+        padding: 1rem;
+    }
+
+    .preview-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .qr-image-container {
+        margin: 0 auto;
+    }
+
+    .preview-actions {
+        justify-content: center;
+    }
+
+    .qr-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Print Styles */
+@media print {
+
+    .admin-header,
+    .qr-info-banner,
+    .qr-card-actions,
+    .preview-header .close-btn,
+    .preview-actions {
+        display: none !important;
+    }
+
+    .qr-preview-card,
+    .qr-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #e2e8f0;
+    }
+}

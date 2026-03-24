@@ -1,0 +1,16 @@
+/* ============================================
+   MINJAL SALON - MAIN ENTRY STYLES
+   Luxury Salon Website
+   ============================================ */
+
+/* Import Design System */
+@import './styles/variables.css';
+@import './styles/global.css';
+@import './styles/buttons.css';
+@import './styles/cards.css';
+
+/* Root Element */
+#root {
+  min-height: 100vh;
+  width: 100%;
+}

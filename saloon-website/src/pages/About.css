@@ -1,0 +1,231 @@
+/* ============================================
+   MINJAL SALON - ABOUT PAGE
+   Luxury About Page
+   ============================================ */
+
+/* ========== CONTENT SECTIONS ========== */
+.content-section {
+    max-width: 900px;
+    margin: 0 auto var(--space-3xl);
+    text-align: center;
+    padding: var(--space-3xl);
+    background: var(--color-white);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+}
+
+.content-section.philosophy {
+    background: var(--color-cream);
+}
+
+.content-section.owner {
+    background: var(--gradient-hero);
+    color: var(--color-white);
+}
+
+.content-section.owner .section-title,
+.content-section.owner .section-text {
+    color: var(--color-white);
+}
+
+.section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: var(--gradient-gold);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-lg);
+    color: var(--color-navy-deep);
+}
+
+.content-section.owner .section-icon {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    color: var(--color-gold-champagne);
+}
+
+.section-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-4xl);
+    font-weight: var(--font-bold);
+    color: var(--color-navy-deep);
+    margin-bottom: var(--space-lg);
+}
+
+.section-text {
+    font-family: var(--font-body);
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-gray-dark);
+}
+
+/* ========== VALUES SECTION ========== */
+.values-section {
+    margin-top: var(--space-4xl);
+    text-align: center;
+}
+
+.values-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-5xl);
+    font-weight: var(--font-bold);
+    color: var(--color-navy-deep);
+    margin-bottom: var(--space-3xl);
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-xl);
+}
+
+.value-card {
+    padding: var(--space-2xl);
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    transition: all var(--duration-normal) var(--ease-smooth);
+    text-align: center;
+}
+
+.value-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-2xl);
+}
+
+.value-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: var(--color-cream);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-lg);
+    color: var(--color-gold-champagne);
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.value-card:hover .value-icon {
+    background: var(--gradient-gold);
+    color: var(--color-navy-deep);
+    transform: scale(1.1);
+}
+
+.value-card h3 {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--color-navy-deep);
+    margin-bottom: var(--space-sm);
+}
+
+.value-card p {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-gray-dark);
+    line-height: var(--leading-relaxed);
+    margin: 0;
+}
+
+/* ========== CTA SECTION ========== */
+.about-cta-section {
+    padding: var(--space-3xl) 0;
+    background: var(--color-cream);
+}
+
+.about-cta-section .cta-content {
+    text-align: center;
+    padding: var(--space-3xl);
+    background: var(--color-white);
+    border-radius: var(--radius-2xl);
+    border: 2px solid var(--color-gold-champagne);
+}
+
+.about-cta-section h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-4xl);
+    font-weight: var(--font-bold);
+    color: var(--color-navy-deep);
+    margin-bottom: var(--space-md);
+}
+
+.about-cta-section p {
+    font-family: var(--font-accent);
+    font-size: var(--text-xl);
+    font-style: italic;
+    color: var(--color-gray-dark);
+    margin-bottom: var(--space-xl);
+}
+
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .content-section {
+        padding: var(--space-2xl);
+        margin-bottom: var(--space-2xl);
+    }
+
+    .section-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .section-title {
+        font-size: var(--text-3xl);
+    }
+
+    .section-text {
+        font-size: var(--text-base);
+    }
+
+    .values-title {
+        font-size: var(--text-4xl);
+    }
+
+    .values-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+    }
+
+    .value-card {
+        padding: var(--space-xl);
+    }
+
+    .value-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .about-cta-section .cta-content {
+        padding: var(--space-2xl);
+    }
+
+    .about-cta-section h2 {
+        font-size: var(--text-3xl);
+    }
+
+    .about-cta-section p {
+        font-size: var(--text-lg);
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+    }
+
+    .cta-buttons .btn-primary,
+    .cta-buttons .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+}

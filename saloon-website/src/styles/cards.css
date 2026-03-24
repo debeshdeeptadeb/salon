@@ -1,0 +1,304 @@
+/* ============================================
+   MINJAL SALON - PREMIUM CARD COMPONENTS
+   Luxury Card Styles
+   ============================================ */
+
+/* ========== BASE CARD ========== */
+.card {
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: all var(--duration-normal) var(--ease-smooth);
+    box-shadow: var(--shadow-md);
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-2xl);
+}
+
+/* ========== GLASS CARD ========== */
+.card-glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+    box-shadow: var(--glass-shadow);
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.card-glass:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-4px);
+}
+
+/* ========== SERVICE CARD ========== */
+.service-card {
+    position: relative;
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: all var(--duration-normal) var(--ease-smooth);
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+}
+
+.service-card-image {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+}
+
+.service-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--duration-slower) var(--ease-smooth);
+}
+
+.service-card:hover .service-card-image img {
+    transform: scale(1.1);
+}
+
+.service-card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--gradient-overlay);
+    padding: var(--space-lg);
+    transform: translateY(100%);
+    transition: transform var(--duration-normal) var(--ease-smooth);
+}
+
+.service-card:hover .service-card-overlay {
+    transform: translateY(0);
+}
+
+.service-card-content {
+    padding: var(--space-lg);
+}
+
+.service-card-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-semibold);
+    color: var(--color-navy-deep);
+    margin-bottom: var(--space-xs);
+}
+
+.service-card-description {
+    font-size: var(--text-base);
+    color: var(--color-gray-dark);
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-md);
+}
+
+.service-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-gray-medium);
+}
+
+.service-card-price {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: var(--font-bold);
+    color: var(--color-gold-champagne);
+}
+
+.service-card-duration {
+    font-size: var(--text-sm);
+    color: var(--color-gray-dark);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-2xl);
+}
+
+/* ========== TESTIMONIAL CARD ========== */
+.testimonial-card {
+    background: var(--color-cream);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    position: relative;
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.testimonial-card::before {
+    content: '"';
+    position: absolute;
+    top: var(--space-md);
+    left: var(--space-md);
+    font-family: var(--font-heading);
+    font-size: 6rem;
+    color: var(--color-gold-champagne);
+    opacity: 0.2;
+    line-height: 1;
+}
+
+.testimonial-content {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-accent);
+    font-size: var(--text-lg);
+    font-style: italic;
+    line-height: var(--leading-relaxed);
+    color: var(--color-navy-deep);
+    margin-bottom: var(--space-lg);
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.testimonial-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    border: 3px solid var(--color-gold-champagne);
+}
+
+.testimonial-info h4 {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    color: var(--color-navy-deep);
+    margin-bottom: 0.25rem;
+}
+
+.testimonial-info p {
+    font-size: var(--text-sm);
+    color: var(--color-gray-dark);
+    margin: 0;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+/* ========== TEAM CARD ========== */
+.team-card {
+    position: relative;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.team-card-image {
+    width: 100%;
+    height: 400px;
+    position: relative;
+    overflow: hidden;
+}
+
+.team-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--duration-slower) var(--ease-smooth);
+}
+
+.team-card:hover .team-card-image img {
+    transform: scale(1.1);
+}
+
+.team-card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--gradient-overlay);
+    padding: var(--space-lg);
+    color: var(--color-white);
+}
+
+.team-card-name {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-xs);
+}
+
+.team-card-role {
+    font-size: var(--text-base);
+    color: var(--color-gold-light);
+    margin-bottom: var(--space-sm);
+}
+
+.team-card-social {
+    display: flex;
+    gap: var(--space-sm);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.team-card:hover .team-card-social {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.team-card:hover {
+    box-shadow: var(--shadow-2xl);
+}
+
+/* ========== GALLERY CARD ========== */
+.gallery-card {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.gallery-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--duration-slower) var(--ease-smooth);
+}
+
+.gallery-card:hover .gallery-card-image {
+    transform: scale(1.15);
+}
+
+.gallery-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 22, 40, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--duration-normal) var(--ease-smooth);
+}
+
+.gallery-card:hover .gallery-card-overlay {
+    opacity: 1;
+}
+
+.gallery-card-icon {
+    color: var(--color-white);
+    font-size: 3rem;
+    transform: scale(0.8);
+    transition: transform var(--duration-normal) var(--ease-bounce);
+}
+
+.gallery-card:hover .gallery-card-icon {
+    transform: scale(1);
+}

@@ -1,0 +1,222 @@
+/* ============================================
+   MINJAL SALON - CATALOGUE PAGE
+   Luxury Catalogue Showcase
+   ============================================ */
+
+/* ========== CATALOGUE MASONRY GRID ========== */
+.catalogue-masonry {
+  column-count: 3;
+  column-gap: var(--space-xl);
+}
+
+.catalogue-card {
+  break-inside: avoid;
+  margin-bottom: var(--space-xl);
+  background: var(--color-white);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: all var(--duration-normal) var(--ease-smooth);
+  cursor: pointer;
+  position: relative;
+  animation: fadeInUp var(--duration-slow) var(--ease-smooth) both;
+}
+
+.catalogue-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-2xl);
+}
+
+.catalogue-image {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.catalogue-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform var(--duration-slower) var(--ease-smooth);
+}
+
+.catalogue-card:hover .catalogue-image img {
+  transform: scale(1.1);
+}
+
+.image-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 22, 40, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-smooth);
+}
+
+.catalogue-card:hover .image-overlay {
+  opacity: 1;
+}
+
+.overlay-icon {
+  color: var(--color-white);
+  transform: scale(0.8);
+  transition: transform var(--duration-normal) var(--ease-bounce);
+}
+
+.catalogue-card:hover .overlay-icon {
+  transform: scale(1);
+}
+
+.catalogue-content-card {
+  padding: var(--space-xl);
+}
+
+.catalogue-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--color-navy-deep);
+  margin-bottom: var(--space-sm);
+  line-height: var(--leading-tight);
+}
+
+.catalogue-description {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-md);
+}
+
+.catalogue-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-gray-medium);
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-gray-dark);
+}
+
+.meta-item svg {
+  color: var(--color-gold-champagne);
+}
+
+.meta-price {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-gold-champagne);
+}
+
+.catalogue-corner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50px;
+  height: 50px;
+  background: var(--gradient-gold);
+  clip-path: polygon(100% 0, 0 0, 100% 100%);
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-smooth);
+}
+
+.catalogue-card:hover .catalogue-corner {
+  opacity: 1;
+}
+
+/* ========== CTA SECTION ========== */
+.catalogue-cta-section {
+  padding: var(--space-3xl) 0;
+  background: var(--gradient-hero);
+}
+
+.catalogue-cta-section .cta-content {
+  text-align: center;
+  padding: var(--space-3xl);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+}
+
+.catalogue-cta-section h2 {
+  font-family: var(--font-heading);
+  font-size: var(--text-4xl);
+  font-weight: var(--font-bold);
+  color: var(--color-white);
+  margin-bottom: var(--space-md);
+}
+
+.catalogue-cta-section p {
+  font-family: var(--font-accent);
+  font-size: var(--text-xl);
+  font-style: italic;
+  color: var(--color-cream);
+  margin-bottom: var(--space-xl);
+}
+
+/* ========== EMPTY STATE ========== */
+.empty-state {
+  text-align: center;
+  padding: var(--space-3xl);
+  background: var(--color-cream);
+  border-radius: var(--radius-2xl);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: var(--space-lg);
+}
+
+.empty-state h3 {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  color: var(--color-navy-deep);
+  margin-bottom: var(--space-sm);
+}
+
+.empty-state p {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-gray-dark);
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1024px) {
+  .catalogue-masonry {
+    column-count: 2;
+    column-gap: var(--space-lg);
+  }
+}
+
+@media (max-width: 768px) {
+  .catalogue-masonry {
+    column-count: 1;
+  }
+
+  .catalogue-content-card {
+    padding: var(--space-lg);
+  }
+
+  .catalogue-cta-section .cta-content {
+    padding: var(--space-2xl);
+  }
+
+  .catalogue-cta-section h2 {
+    font-size: var(--text-3xl);
+  }
+
+  .catalogue-cta-section p {
+    font-size: var(--text-lg);
+  }
+}

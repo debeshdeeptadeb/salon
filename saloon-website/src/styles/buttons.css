@@ -1,0 +1,191 @@
+/* ============================================
+   MINJAL SALON - PREMIUM BUTTON COMPONENTS
+   Luxury Button Styles
+   ============================================ */
+
+/* ========== PRIMARY BUTTON ========== */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: 1rem 2rem;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    color: var(--color-navy-deep);
+    background: var(--gradient-gold);
+    border: none;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all var(--duration-normal) var(--ease-smooth);
+    box-shadow: var(--shadow-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--gradient-shimmer);
+    transition: left var(--duration-slow) var(--ease-smooth);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(212, 175, 55, 0.4);
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* ========== SECONDARY BUTTON ========== */
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: 1rem 2rem;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    color: var(--color-gold-champagne);
+    background: transparent;
+    border: 2px solid var(--color-gold-champagne);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--duration-normal) var(--ease-smooth);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.btn-secondary:hover {
+    color: var(--color-navy-deep);
+    background: var(--color-gold-champagne);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-gold);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* ========== GHOST BUTTON ========== */
+.btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: var(--font-medium);
+    color: var(--color-navy-deep);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all var(--duration-normal) var(--ease-smooth);
+    position: relative;
+}
+
+.btn-ghost::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--gradient-gold);
+    transition: all var(--duration-normal) var(--ease-smooth);
+    transform: translateX(-50%);
+}
+
+.btn-ghost:hover::after {
+    width: 100%;
+}
+
+.btn-ghost:hover {
+    color: var(--color-gold-champagne);
+}
+
+/* ========== ICON BUTTON ========== */
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--duration-normal) var(--ease-smooth);
+    color: var(--color-navy-deep);
+}
+
+.btn-icon:hover {
+    background: var(--color-gold-champagne);
+    color: var(--color-white);
+    transform: scale(1.1);
+    box-shadow: var(--shadow-gold);
+}
+
+/* ========== LARGE BUTTON ========== */
+.btn-lg {
+    padding: 1.25rem 2.5rem;
+    font-size: var(--text-lg);
+}
+
+/* ========== SMALL BUTTON ========== */
+.btn-sm {
+    padding: 0.75rem 1.5rem;
+    font-size: var(--text-sm);
+}
+
+/* ========== BUTTON WITH ICON ========== */
+.btn-with-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.btn-with-icon svg,
+.btn-with-icon i {
+    font-size: 1.25em;
+    transition: transform var(--duration-normal) var(--ease-smooth);
+}
+
+.btn-with-icon:hover svg,
+.btn-with-icon:hover i {
+    transform: translateX(4px);
+}
+
+/* ========== DISABLED STATE ========== */
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-ghost:disabled,
+.btn-icon:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-primary:disabled:hover,
+.btn-secondary:disabled:hover,
+.btn-ghost:disabled:hover,
+.btn-icon:disabled:hover {
+    box-shadow: none;
+}
