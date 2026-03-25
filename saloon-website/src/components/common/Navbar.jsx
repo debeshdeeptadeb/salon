@@ -10,6 +10,9 @@ export default function Navbar() {
   const [logo, setLogo] = useState(defaultLogo);
   const [siteName, setSiteName] = useState('MINJAL');
   const [siteTagline, setSiteTagline] = useState('Luxury Salon');
+  const WA_PHONE = "919337720521";
+  const BOOKING_MESSAGE = "Hello Minjal Salon! I want to book an appointment. Please share available time slots. Thank you!";
+  const WA_BOOK_LINK = `https://wa.me/${WA_PHONE}?text=${encodeURIComponent(BOOKING_MESSAGE)}`;
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -80,7 +83,7 @@ export default function Navbar() {
             Admin
           </Link>
           <a
-            href="https://wa.me/919337720521"
+            href={WA_BOOK_LINK}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-primary navbar-btn"
@@ -131,7 +134,7 @@ export default function Navbar() {
         </nav>
         <div className="mobile-menu-cta">
           <a
-            href="https://wa.me/919337720521"
+            href={WA_BOOK_LINK}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-primary"

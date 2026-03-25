@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import { FiArrowRight } from "react-icons/fi";
-import { FaCrown, FaClock, FaGem, FaMedal, FaRegSmile, FaStar, FaWhatsapp } from "react-icons/fa";
+import { FaCalendarAlt, FaCrown, FaClock, FaGem, FaMedal, FaRegSmile, FaStar, FaWhatsapp } from "react-icons/fa";
 import { FaWandMagicSparkles } from "react-icons/fa6";
 import "./Hero.css";
 import { homeContentAPI } from "../../services/api";
 
 export default function Hero() {
+  const WA_PHONE = "919337720521";
+  const BOOKING_MESSAGE = "Hello Minjal Salon! I want to book an appointment. Please share available time slots. Thank you!";
+  const WA_BOOK_LINK = `https://wa.me/${WA_PHONE}?text=${encodeURIComponent(BOOKING_MESSAGE)}`;
+
   const [heroData, setHeroData] = useState({
     badge_text: "Bhubaneswar's Premier Luxury Salon",
     title_main: "Where Elegance Meets Expert Care",
@@ -125,6 +129,34 @@ export default function Hero() {
               <div className="frame-corner frame-corner-tr"></div>
               <div className="frame-corner frame-corner-bl"></div>
               <div className="frame-corner frame-corner-br"></div>
+            </div>
+
+            {/* Luxury Showcase (replaces empty square) */}
+            <div className="hero-showcase" aria-label="Luxury consultation card">
+              <div className="hero-showcase-glow" aria-hidden="true" />
+              <div className="hero-showcase-inner">
+                <div className="hero-showcase-pill">
+                  <span className="hero-showcase-pill-icon" aria-hidden="true">
+                    <FaCalendarAlt />
+                  </span>
+                  <span className="hero-showcase-pill-text">Premium Appointment Slots</span>
+                </div>
+
+                <h3 className="hero-showcase-title">Luxury Care Tailored to You</h3>
+                <p className="hero-showcase-subtitle">
+                  Book in minutes and get expert recommendations for your next visit.
+                </p>
+
+                <a
+                  href={WA_BOOK_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hero-showcase-btn"
+                >
+                  <span>Book via WhatsApp</span>
+                  <FiArrowRight size={20} aria-hidden="true" />
+                </a>
+              </div>
             </div>
 
             {/* Floating Elements */}
