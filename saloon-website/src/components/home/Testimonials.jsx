@@ -1,4 +1,5 @@
 import "./Testimonials.css"
+import { FaStar } from "react-icons/fa";
 const testimonials = [
   {
     name: "Ananya S.",
@@ -26,7 +27,11 @@ export default function Testimonials() {
         <div className="testimonial-slider">
           {testimonials.map((t, i) => (
             <div className="testimonial-card" key={i}>
-              <div className="stars">★★★★★</div>
+              <div className="stars" aria-label="5 star rating">
+                {Array.from({ length: 5 }).map((_, idx) => (
+                  <FaStar key={idx} aria-hidden="true" />
+                ))}
+              </div>
               <p className="quote">“{t.text}”</p>
               <span className="author">
                 {t.name}, {t.city}

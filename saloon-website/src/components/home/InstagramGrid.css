@@ -1,7 +1,10 @@
 /* SECTION */
 .insta-section {
-  padding: 120px 6%;
-  background: #faf8f6;
+  padding: clamp(72px, 10vw, 120px) 6%;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(212, 175, 55, 0.18), rgba(212, 175, 55, 0) 50%),
+    radial-gradient(circle at 90% 20%, rgba(183, 110, 121, 0.18), rgba(183, 110, 121, 0) 45%),
+    #faf8f6;
 }
 
 /* GRID */
@@ -41,7 +44,7 @@
 .insta-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(122, 30, 30, 0.65);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.78) 0%, rgba(183, 110, 121, 0.62) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -51,6 +54,13 @@
   text-transform: uppercase;
   opacity: 0;
   transition: opacity 0.4s ease;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.insta-social-icon {
+  width: 22px;
+  height: 22px;
 }
 
 /* HOVER EFFECTS */
@@ -84,5 +94,17 @@
 @media (max-width: 900px) {
   .insta-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .insta-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 40px;
+  }
+
+  .insta-cta {
+    margin-top: 40px;
   }
 }

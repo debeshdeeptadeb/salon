@@ -2,6 +2,27 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./ServicesPreview.css";
 import { homeContentAPI } from "../../services/api";
+import { FiArrowRight } from "react-icons/fi";
+import { FaCut, FaGem, FaHandSparkles, FaRing, FaSpa, FaStar } from "react-icons/fa";
+import { FaWandMagicSparkles } from "react-icons/fa6";
+
+function renderServiceIcon(iconValue, title) {
+  const key = (iconValue || "").trim();
+  const t = (title || "").toLowerCase();
+
+  if (t.includes("hair")) return <FaCut aria-hidden="true" />;
+  if (t.includes("nail")) return <FaHandSparkles aria-hidden="true" />;
+  if (t.includes("skin") || t.includes("spa")) return <FaSpa aria-hidden="true" />;
+  if (t.includes("bridal") || t.includes("makeup")) return <FaRing aria-hidden="true" />;
+
+  // Fallback mapping if the backend stores emoji-like keys
+  if (key === "✂") return <FaCut aria-hidden="true" />;
+  if (key === "💅") return <FaHandSparkles aria-hidden="true" />;
+  if (key === "✨") return <FaGem aria-hidden="true" />;
+  if (key === "👰") return <FaRing aria-hidden="true" />;
+
+  return <FaStar aria-hidden="true" />;
+}
 
 const defaultServices = [
   {
@@ -69,9 +90,13 @@ export default function ServicesPreview() {
         {/* Section Header */}
         <div className="section-header">
           <span className="section-badge fade-in">
-            <span className="badge-icon">✦</span>
+            <span className="badge-icon" aria-hidden="true">
+              <FaWandMagicSparkles />
+            </span>
             <span className="badge-text">Our Expertise</span>
-            <span className="badge-icon">✦</span>
+            <span className="badge-icon" aria-hidden="true">
+              <FaWandMagicSparkles />
+            </span>
           </span>
           <h2 className="section-title fade-in-up">
             Signature <span className="highlight-gold">Services</span>
@@ -89,6 +114,7 @@ export default function ServicesPreview() {
               key={service.id}
               className={`service-card ${activeService === index ? 'active' : ''}`}
               onMouseEnter={() => setActiveService(index)}
+              onTouchStart={() => setActiveService(index)}
             >
               <div className="service-card-image">
                 <img src={service.image_url} alt={service.title} loading="lazy" />
@@ -96,15 +122,13 @@ export default function ServicesPreview() {
               </div>
 
               <div className="service-card-content">
-                <div className="service-icon">{service.icon}</div>
+                <div className="service-icon">{renderServiceIcon(service.icon, service.title)}</div>
                 <h3 className="service-title">{service.title}</h3>
                 <p className="service-desc">{service.description}</p>
 
                 <Link to="/services" className="service-link">
                   <span>Explore More</span>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
+                  <FiArrowRight size={20} aria-hidden="true" />
                 </Link>
               </div>
 
@@ -121,9 +145,7 @@ export default function ServicesPreview() {
           </p>
           <Link to="/services" className="btn-primary btn-lg">
             <span>View All Services</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
+            <FiArrowRight size={20} aria-hidden="true" />
           </Link>
         </div>
       </div>

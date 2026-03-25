@@ -90,6 +90,15 @@
 .badge-icon {
   color: var(--color-gold-champagne);
   font-size: var(--text-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge-icon svg {
+  width: 1em;
+  height: 1em;
+  display: block;
 }
 
 .badge-text {
@@ -166,6 +175,25 @@
 
 .trust-item {
   text-align: center;
+}
+
+.trust-icon {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto var(--space-xs);
+  border-radius: var(--radius-full);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--glass-shadow);
+}
+
+.trust-icon svg {
+  color: var(--color-gold-champagne);
+  width: 22px;
+  height: 22px;
 }
 
 .trust-number {
@@ -293,6 +321,15 @@
 .element-icon {
   font-size: var(--text-2xl);
   color: var(--color-gold-champagne);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.element-icon svg {
+  width: 1em;
+  height: 1em;
+  display: block;
 }
 
 .element-text {
@@ -381,6 +418,7 @@
 @media (max-width: 900px) {
   .hero {
     padding-top: 80px;
+    min-height: auto;
   }
 
   .hero-container {

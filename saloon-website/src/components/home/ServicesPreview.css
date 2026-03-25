@@ -23,6 +23,15 @@
 .section-badge .badge-icon {
   color: var(--color-gold-champagne);
   font-size: var(--text-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section-badge .badge-icon svg {
+  width: 1em;
+  height: 1em;
+  display: block;
 }
 
 .section-badge .badge-text {
@@ -120,8 +129,17 @@
 .service-icon {
   font-size: 3rem;
   margin-bottom: var(--space-md);
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gold-champagne);
   animation: float 3s ease-in-out infinite;
+}
+
+.service-icon svg {
+  width: 1em;
+  height: 1em;
+  display: block;
 }
 
 .service-title {

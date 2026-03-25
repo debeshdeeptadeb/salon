@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./PricePreview.css";
 import { homeContentAPI } from "../../services/api";
+import { FiArrowRight } from "react-icons/fi";
 
 const defaultPrices = [
   { service_name: "Hair Styling", price: "₹999+" },
@@ -11,6 +13,7 @@ const defaultPrices = [
 
 export default function PricePreview() {
   const [prices, setPrices] = useState(defaultPrices);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPrices = async () => {
@@ -42,7 +45,10 @@ export default function PricePreview() {
       </div>
 
       <div className="price-cta">
-        <button className="primary-btn">View Full Catalogue</button>
+        <button className="primary-btn" onClick={() => navigate("/catalogue")}>
+          <span>View Full Catalogue</span>
+          <FiArrowRight size={20} aria-hidden="true" />
+        </button>
       </div>
     </section>
   );

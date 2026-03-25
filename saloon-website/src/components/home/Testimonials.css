@@ -33,9 +33,18 @@
 }
 
 .stars {
-  color: var(--accent);
-  font-size: 18px;
+  color: var(--color-gold-champagne);
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 12px;
+}
+
+.stars svg {
+  width: 18px;
+  height: 18px;
+  display: block;
 }
 
 .quote {
@@ -45,7 +54,7 @@
 
 .author {
   font-weight: 500;
-  color: var(--primary);
+  color: var(--color-gold-champagne);
 }
 
 @media (max-width: 768px) {
