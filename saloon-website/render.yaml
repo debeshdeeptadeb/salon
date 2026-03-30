@@ -2,7 +2,7 @@ services:
   - type: web
     name: minjal-salon-backend
     env: node
-    rootDir: backend
+    rootDir: saloon-website/backend
     plan: free
     buildCommand: npm ci
     startCommand: npm start
