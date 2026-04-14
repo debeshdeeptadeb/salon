@@ -20,15 +20,15 @@ const createAdminUser = async () => {
         if (existing.rows.length > 0) {
             // Update existing admin
             await pool.query(
-                'UPDATE admins SET password = $1, name = $2 WHERE email = $3',
-                [hashedPassword, name, email]
+                'UPDATE admins SET password = $1, name = $2, role = $3, salon_id = NULL WHERE email = $4',
+                [hashedPassword, name, 'super_admin', email]
             );
             console.log('✅ Admin user updated successfully');
         } else {
             // Create new admin
             await pool.query(
-                'INSERT INTO admins (email, password, name, role) VALUES ($1, $2, $3, $4)',
-                [email, hashedPassword, name, 'admin']
+                'INSERT INTO admins (email, password, name, role, salon_id) VALUES ($1, $2, $3, $4, NULL)',
+                [email, hashedPassword, name, 'super_admin']
             );
             console.log('✅ Admin user created successfully');
         }

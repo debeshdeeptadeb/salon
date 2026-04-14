@@ -20,6 +20,19 @@
     animation: fadeInUp 0.6s ease;
 }
 
+.login-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+}
+
+.login-back-link:hover {
+    color: var(--primary, #701a1a);
+}
+
 @keyframes fadeInUp {
     from {
         opacity: 0;

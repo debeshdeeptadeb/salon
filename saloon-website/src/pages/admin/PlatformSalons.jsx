@@ -11,6 +11,10 @@ export default function PlatformSalons() {
     const [loading, setLoading] = useState(true);
     const [name, setName] = useState('');
     const [slug, setSlug] = useState('');
+    const [area, setArea] = useState('');
+    const [city, setCity] = useState('');
+    const [stateName, setStateName] = useState('');
+    const [pincode, setPincode] = useState('');
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
@@ -37,10 +41,21 @@ export default function PlatformSalons() {
         }
         setSaving(true);
         try {
-            await salonsAPI.create({ name: name.trim(), slug: slug.trim() || undefined });
+            await salonsAPI.create({
+                name: name.trim(),
+                slug: slug.trim() || undefined,
+                area: area.trim() || undefined,
+                city: city.trim() || undefined,
+                state: stateName.trim() || undefined,
+                pincode: pincode.trim() || undefined,
+            });
             toast.success('Salon created');
             setName('');
             setSlug('');
+            setArea('');
+            setCity('');
+            setStateName('');
+            setPincode('');
             fetchSalons();
         } catch (err) {
             toast.error(err.response?.data?.error || 'Could not create salon');
@@ -98,6 +113,38 @@ export default function PlatformSalons() {
                             placeholder="e.g. minjal-cut — used as ?salon= on the public site"
                         />
                     </div>
+                    <div className="form-group">
+                        <label>Area / Street</label>
+                        <input
+                            value={area}
+                            onChange={(e) => setArea(e.target.value)}
+                            placeholder="e.g. Buxi Bazaar Road"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>City</label>
+                        <input
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                            placeholder="e.g. Cuttack"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>State</label>
+                        <input
+                            value={stateName}
+                            onChange={(e) => setStateName(e.target.value)}
+                            placeholder="e.g. Odisha"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Pincode</label>
+                        <input
+                            value={pincode}
+                            onChange={(e) => setPincode(e.target.value)}
+                            placeholder="e.g. 753001"
+                        />
+                    </div>
                     <button type="submit" className="admin-btn" disabled={saving}>
                         {saving ? 'Creating…' : 'Create salon'}
                     </button>
@@ -119,6 +166,7 @@ export default function PlatformSalons() {
                             <tr>
                                 <th>Name</th>
                                 <th>Slug</th>
+                                <th>Location</th>
                                 <th>Public link hint</th>
                             </tr>
                         </thead>
@@ -129,6 +177,7 @@ export default function PlatformSalons() {
                                     <td>
                                         <code>{s.slug}</code>
                                     </td>
+                                    <td>{[s.area, s.city, s.state, s.pincode].filter(Boolean).join(', ') || '-'}</td>
                                     <td style={{ fontSize: '0.88rem', color: '#666' }}>
                                         Append <code>?salon={s.slug}</code> to your site, or set
                                         localStorage <code>publicSalonSlug</code> for testing.

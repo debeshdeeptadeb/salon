@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { HiOutlineShieldCheck } from 'react-icons/hi2';
+import { Link, useNavigate } from 'react-router-dom';
+import { HiOutlineArrowLeft, HiOutlineShieldCheck } from 'react-icons/hi2';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import './Login.css';
@@ -41,6 +41,10 @@ export default function Login() {
         <div className="login-page">
             <div className="login-container">
                 <div className="login-card">
+                    <Link to="/" className="login-back-link">
+                        <HiOutlineArrowLeft size={18} />
+                        Back to Home
+                    </Link>
                     <div className="login-header">
                         <div className="login-brand-icon" aria-hidden>
                             <HiOutlineShieldCheck size={40} />

@@ -68,6 +68,7 @@ export const salonsAPI = {
     list: () => api.get('/salons'),
     create: (data) => api.post('/salons', data),
     getPublic: (slug) => api.get(`/salons/public/${slug}`),
+    discover: (params) => api.get('/salons/discover', { params }),
 };
 
 export const salonStaffAPI = {

@@ -4,6 +4,9 @@ import pool from '../config/database.js';
 
 // Generate JWT Token
 const generateToken = (id) => {
+    if (!process.env.JWT_SECRET) {
+        throw new Error('JWT_SECRET is missing in server environment');
+    }
     return jwt.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRE || '7d'
     });
@@ -15,9 +18,10 @@ const generateToken = (id) => {
 export const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
+        const normalizedEmail = String(email || '').trim().toLowerCase();
 
         // Validation
-        if (!email || !password) {
+        if (!normalizedEmail || !password) {
             return res.status(400).json({
                 success: false,
                 error: 'Please provide email and password'
@@ -29,7 +33,7 @@ export const login = async (req, res, next) => {
              FROM admins a
              LEFT JOIN salons s ON a.salon_id = s.id
              WHERE a.email = $1`,
-            [email]
+            [normalizedEmail]
         );
 
         if (result.rows.length === 0) {

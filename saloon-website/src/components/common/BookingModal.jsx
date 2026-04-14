@@ -236,9 +236,9 @@ export default function BookingModal({ isOpen, onClose, service }) {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="notes">Additional Notes</label>
+                            <label htmlFor="notes">Bio / Additional Notes</label>
                             <textarea id="notes" name="notes" value={formData.notes} onChange={handleChange}
-                                placeholder="Any special requests or preferences (optional)" rows="3" />
+                                placeholder="Add bio details, preferences, allergies, or special request (optional)" rows="3" />
                         </div>
 
                         <button type="submit" className="btn-submit">

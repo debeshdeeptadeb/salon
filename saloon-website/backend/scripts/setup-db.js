@@ -30,8 +30,14 @@ const setupDatabase = async () => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         await pool.query(
-            'INSERT INTO admins (email, password, name, role) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING',
-            [email, hashedPassword, name, 'admin']
+            `INSERT INTO admins (email, password, name, role, salon_id)
+             VALUES ($1, $2, $3, $4, NULL)
+             ON CONFLICT (email) DO UPDATE SET
+               password = EXCLUDED.password,
+               name = EXCLUDED.name,
+               role = EXCLUDED.role,
+               salon_id = NULL`,
+            [email, hashedPassword, name, 'super_admin']
         );
         console.log('✅ Admin user created successfully\n');
 
