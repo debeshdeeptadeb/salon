@@ -77,12 +77,13 @@ export default function ServicesPreview() {
   }, []);
 
   useEffect(() => {
+    if (!services.length) return;
     const interval = setInterval(() => {
       setActiveService((prev) => (prev + 1) % services.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [services.length]);
 
   return (
     <section className="services-preview section" id="services-preview">

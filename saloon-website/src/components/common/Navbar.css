@@ -29,7 +29,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-lg);
+  gap: 0.75rem;
 }
 
 /* ========== LOGO ========== */
@@ -38,6 +38,7 @@
   align-items: center;
   gap: var(--space-sm);
   transition: transform var(--duration-normal) var(--ease-smooth);
+  flex-shrink: 0;
 }
 
 .navbar-logo:hover {
@@ -76,19 +77,19 @@
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: var(--space-xl);
-  flex: 1;
+  gap: 0.8rem;
+  flex-shrink: 0;
   justify-content: center;
 }
 
 .nav-link {
   position: relative;
   font-family: var(--font-body);
-  font-size: var(--text-sm);
+  font-size: 0.74rem;
   font-weight: var(--font-medium);
   color: var(--color-navy-deep);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
   padding: var(--space-xs) 0;
   transition: color var(--duration-normal) var(--ease-smooth);
 }
@@ -117,7 +118,8 @@
 .navbar-cta {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: 0.55rem;
+  flex-shrink: 0;
 }
 
 .navbar-admin-link {
@@ -141,8 +143,8 @@
 }
 
 .navbar-btn {
-  padding: 0.75rem 1.75rem !important;
-  font-size: var(--text-sm) !important;
+  padding: 0.62rem 1rem !important;
+  font-size: 0.75rem !important;
 }
 
 /* ========== MOBILE MENU TOGGLE ========== */
@@ -248,11 +250,17 @@
 /* ========== RESPONSIVE ========== */
 @media (max-width: 1024px) {
   .navbar-links {
-    gap: var(--space-lg);
+    gap: 0.65rem;
   }
 
   .nav-link {
-    font-size: 0.8125rem;
+    font-size: 0.69rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  .navbar-links {
+    display: none;
   }
 }
 
@@ -269,6 +277,7 @@
 
   .navbar-inner {
     height: 80px;
+    gap: var(--space-sm);
   }
 
   .navbar-logo img {

@@ -1,0 +1,53 @@
+/* ============================================
+   HOME PAGE MASTER STYLES
+   ============================================ */
+
+.home-page {
+  background: linear-gradient(180deg, #f8f9fc 0%, #f7f3ee 45%, #f8f9fc 100%);
+}
+
+.home-section {
+  position: relative;
+}
+
+.home-section::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: min(1100px, calc(100% - 2rem));
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, rgba(16, 42, 88, 0.08), transparent);
+}
+
+.home-section-search {
+  margin-top: -22px;
+  z-index: 2;
+}
+
+.home-section-services,
+.home-section-price,
+.home-section-testimonials,
+.home-section-gallery {
+  padding-top: clamp(20px, 3vw, 40px);
+}
+
+.home-section-price::after,
+.home-section-testimonials::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 12% 20%, rgba(212, 175, 55, 0.09), transparent 45%);
+}
+
+@media (max-width: 900px) {
+  .home-section-search {
+    margin-top: -12px;
+  }
+
+  .home-section::before {
+    width: calc(100% - 1.5rem);
+  }
+}

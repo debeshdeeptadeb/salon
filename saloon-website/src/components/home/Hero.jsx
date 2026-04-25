@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FiArrowRight } from "react-icons/fi";
 import { FaCalendarAlt, FaCrown, FaClock, FaGem, FaMedal, FaRegSmile, FaStar, FaWhatsapp } from "react-icons/fa";
 import { FaWandMagicSparkles } from "react-icons/fa6";
@@ -6,6 +7,7 @@ import "./Hero.css";
 import { homeContentAPI } from "../../services/api";
 
 export default function Hero() {
+  const navigate = useNavigate();
   const WA_PHONE = "919337720521";
   const BOOKING_MESSAGE = "Hello Minjal Salon! I want to book an appointment. Please share available time slots. Thank you!";
   const WA_BOOK_LINK = `https://wa.me/${WA_PHONE}?text=${encodeURIComponent(BOOKING_MESSAGE)}`;
@@ -33,13 +35,6 @@ export default function Hero() {
 
     fetchHeroContent();
   }, []);
-
-  const scrollToServices = () => {
-    const servicesSection = document.getElementById('services-preview');
-    if (servicesSection) {
-      servicesSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <section className="hero">
@@ -77,7 +72,7 @@ export default function Hero() {
 
           {/* CTA Buttons */}
           <div className="hero-actions fade-in-up">
-            <button className="btn-primary btn-lg" onClick={scrollToServices}>
+            <button className="btn-primary btn-lg" onClick={() => navigate("/services")}>
               <span>Explore Services</span>
               <FiArrowRight size={20} />
             </button>
@@ -131,31 +126,48 @@ export default function Hero() {
               <div className="frame-corner frame-corner-br"></div>
             </div>
 
-            {/* Luxury Showcase (replaces empty square) */}
-            <div className="hero-showcase" aria-label="Luxury consultation card">
-              <div className="hero-showcase-glow" aria-hidden="true" />
-              <div className="hero-showcase-inner">
-                <div className="hero-showcase-pill">
-                  <span className="hero-showcase-pill-icon" aria-hidden="true">
-                    <FaCalendarAlt />
-                  </span>
-                  <span className="hero-showcase-pill-text">Premium Appointment Slots</span>
+            {/* Relatable Service Highlights */}
+            <div className="hero-service-panel" aria-label="Popular services and quick booking info">
+              <div className="hero-service-panel-head">
+                <h3>Most Booked Today</h3>
+                <span>Updated live</span>
+              </div>
+
+              <div className="hero-service-list">
+                <article className="hero-service-item">
+                  <div>
+                    <strong>Haircut + Styling</strong>
+                    <p>45 mins</p>
+                  </div>
+                  <span>₹699</span>
+                </article>
+
+                <article className="hero-service-item">
+                  <div>
+                    <strong>Glow Facial</strong>
+                    <p>60 mins</p>
+                  </div>
+                  <span>₹1199</span>
+                </article>
+
+                <article className="hero-service-item">
+                  <div>
+                    <strong>Beard + Cleanup</strong>
+                    <p>30 mins</p>
+                  </div>
+                  <span>₹499</span>
+                </article>
+              </div>
+
+              <div className="hero-service-footer">
+                <div className="hero-service-pill">
+                  <FaCalendarAlt aria-hidden="true" />
+                  <span>Slots available today</span>
                 </div>
-
-                <h3 className="hero-showcase-title">Luxury Care Tailored to You</h3>
-                <p className="hero-showcase-subtitle">
-                  Book in minutes and get expert recommendations for your next visit.
-                </p>
-
-                <a
-                  href={WA_BOOK_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hero-showcase-btn"
-                >
-                  <span>Book via WhatsApp</span>
-                  <FiArrowRight size={20} aria-hidden="true" />
-                </a>
+                <button className="hero-service-btn" onClick={() => navigate("/services")}>
+                  <span>View Services</span>
+                  <FiArrowRight size={18} aria-hidden="true" />
+                </button>
               </div>
             </div>
 

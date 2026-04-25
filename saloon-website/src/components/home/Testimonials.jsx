@@ -23,6 +23,9 @@ export default function Testimonials() {
     <section className="testimonials">
       <div className="container">
         <h2 className="section-title">What Our Clients Say</h2>
+        <p className="testimonials-subtitle">
+          Real experiences from guests who trust us for consistent quality, personal care, and a relaxing salon journey.
+        </p>
 
         <div className="testimonial-slider">
           {testimonials.map((t, i) => (

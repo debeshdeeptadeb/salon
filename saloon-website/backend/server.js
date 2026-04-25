@@ -79,11 +79,18 @@ app.use(cors({
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
 
-        if (allowedOrigins.indexOf(origin) !== -1) {
+        const isExplicitlyAllowed = allowedOrigins.includes(origin);
+        const isLocalDevOrigin =
+            process.env.NODE_ENV !== 'production' &&
+            /^http:\/\/localhost:\d+$/.test(origin);
+
+        if (isExplicitlyAllowed || isLocalDevOrigin) {
             callback(null, true);
         } else {
             console.log(`❌ CORS blocked origin: ${origin}`);
-            callback(new Error('Not allowed by CORS'));
+            const corsError = new Error('Not allowed by CORS');
+            corsError.statusCode = 403;
+            callback(corsError);
         }
     },
     credentials: true

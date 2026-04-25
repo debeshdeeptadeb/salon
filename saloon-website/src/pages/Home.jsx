@@ -9,14 +9,29 @@ import "./home.css"
 
 export default function Home() {
   return (
-    <> 
+    <main className="home-page"> 
       {/* <OfferBar /> */}
       <Hero />
-      <DiscoverySearch />
-      <ServicesPreview />
-      <PricePreview />
-      <Testimonials />
-      <InstagramGrid />
-    </>
+
+      <section className="home-section home-section-search">
+        <DiscoverySearch />
+      </section>
+
+      <section className="home-section home-section-services">
+        <ServicesPreview />
+      </section>
+
+      <section className="home-section home-section-price">
+        <PricePreview />
+      </section>
+
+      <section className="home-section home-section-testimonials">
+        <Testimonials />
+      </section>
+
+      <section className="home-section home-section-gallery">
+        <InstagramGrid />
+      </section>
+    </main>
   );
 }

@@ -1,12 +1,15 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { FaMagnifyingGlass } from "react-icons/fa6";
 import "./Navbar.css";
 import defaultLogo from "../../assets/logo/minjal-salon-logo.svg";
 import { settingsAPI, API_ORIGIN } from "../../services/api";
+import NavbarSearch from "./NavbarSearch";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [logo, setLogo] = useState(defaultLogo);
   const [siteName, setSiteName] = useState('MINJAL');
   const [siteTagline, setSiteTagline] = useState('Luxury Salon');
@@ -44,10 +47,17 @@ export default function Navbar() {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+    if (!isMobileMenuOpen) setIsMobileSearchOpen(false);
   };
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
+    setIsMobileSearchOpen(false);
+  };
+
+  const toggleMobileSearch = () => {
+    setIsMobileSearchOpen((prev) => !prev);
+    if (isMobileMenuOpen) setIsMobileMenuOpen(false);
   };
 
   return (
@@ -62,6 +72,9 @@ export default function Navbar() {
             <span className="logo-sub">{siteTagline}</span>
           </span>
         </Link>
+
+        {/* DESKTOP SEARCH BAR */}
+        <NavbarSearch />
 
         {/* DESKTOP NAV LINKS */}
         <nav className="navbar-links">
@@ -95,6 +108,15 @@ export default function Navbar() {
           </a>
         </div>
 
+        {/* MOBILE SEARCH ICON */}
+        <button
+          className="nsearch-mobile-toggle"
+          onClick={toggleMobileSearch}
+          aria-label="Search salons"
+        >
+          <FaMagnifyingGlass />
+        </button>
+
         {/* MOBILE MENU TOGGLE */}
         <button
           className={`mobile-menu-toggle ${isMobileMenuOpen ? 'active' : ''}`}
@@ -106,6 +128,9 @@ export default function Navbar() {
           <span></span>
         </button>
       </div>
+
+      {/* MOBILE SEARCH BAR */}
+      <NavbarSearch className={`mobile-search-bar${isMobileSearchOpen ? ' active' : ''}`} />
 
       {/* MOBILE MENU */}
       <div className={`mobile-menu ${isMobileMenuOpen ? 'active' : ''}`}>

@@ -1,81 +1,176 @@
 .discovery-search {
-  background: var(--color-gray-soft);
+  background: transparent;
+  padding-top: clamp(14px, 3vw, 34px);
 }
 
 .discovery-search-header {
   text-align: center;
-  margin-bottom: var(--space-lg);
+  margin-bottom: clamp(18px, 3vw, 28px);
+}
+
+.discovery-search-header h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.7rem, 4.2vw, 2.35rem);
+  color: var(--color-navy-deep);
+  margin-bottom: 8px;
+}
+
+.discovery-search-header p {
+  max-width: 700px;
+  margin: 0 auto;
+  color: #5c6677;
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
 .discovery-search-form {
   display: grid;
-  grid-template-columns: 1.2fr 1fr auto auto;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-lg);
+  grid-template-columns: 1.4fr 1fr auto auto;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 10px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(16, 42, 88, 0.08);
+  box-shadow: 0 22px 48px rgba(17, 43, 82, 0.08);
+  backdrop-filter: blur(10px);
 }
 
 .discovery-search-form input {
-  min-height: 48px;
-  border-radius: var(--radius-lg);
+  min-height: 52px;
+  border-radius: 12px;
   padding: 0 14px;
+  border: 1px solid #d6deec;
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.discovery-search-form input:focus {
+  border-color: #2d72ee;
+  box-shadow: 0 0 0 3px rgba(45, 114, 238, 0.14);
+}
+
+.discovery-search-form .btn-primary,
+.discovery-search-form .btn-secondary {
+  min-height: 52px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.discovery-search-form .btn-primary {
+  background: #2874f0;
+  color: #fff;
+}
+
+.discovery-search-form .btn-primary:hover {
+  background: #0f63ec;
+}
+
+.discovery-search-form .btn-secondary {
+  border: 1px solid #bed2f9;
+  background: #f2f7ff;
+  color: #1d63d7;
+}
+
+.discovery-search-form .btn-secondary:hover {
+  background: #e7f0ff;
 }
 
 .discovery-results {
   display: grid;
-  gap: var(--space-md);
+  gap: 12px;
 }
 
 .discovery-card {
-  background: var(--color-white);
-  border: 1px solid var(--color-gray-medium);
-  border-radius: var(--radius-xl);
-  padding: var(--space-md);
-  box-shadow: var(--shadow-sm);
+  background: #fff;
+  border: 1px solid #d9e5fb;
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 16px 35px rgba(14, 32, 68, 0.08);
 }
 
 .discovery-card-top h3 {
   margin-bottom: 4px;
+  font-size: 1.05rem;
+  color: #13284a;
 }
 
 .discovery-card-top p {
   margin-bottom: 8px;
+  color: #67768f;
+  font-size: 0.94rem;
 }
 
 .distance-pill {
   display: inline-block;
   padding: 4px 10px;
-  border-radius: var(--radius-full);
-  background: rgba(212, 175, 55, 0.16);
-  color: var(--color-navy-deep);
-  font-size: var(--text-sm);
+  border-radius: 999px;
+  background: rgba(40, 116, 240, 0.13);
+  color: #215fca;
+  font-size: 0.76rem;
+  font-weight: 700;
 }
 
 .discovery-services-list {
-  margin-top: var(--space-sm);
+  margin-top: 12px;
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .discovery-service-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-sm);
-  border: 1px solid var(--color-gray-medium);
-  border-radius: var(--radius-md);
+  gap: 12px;
+  border: 1px solid #e8effb;
+  border-radius: 10px;
   padding: 10px 12px;
+  background: #f9fbff;
+}
+
+.discovery-service-item strong {
+  color: #1a2f53;
+}
+
+.discovery-service-item span {
+  color: #7384a0;
+  font-size: 0.84rem;
+}
+
+.discovery-service-item .btn-primary {
+  background: #0f63ec;
+  border-radius: 8px;
+  padding: 0.42rem 0.82rem;
+  font-size: 0.75rem;
+}
+
+.discovery-service-item .btn-primary:hover {
+  background: #0a56cc;
 }
 
 .discovery-note {
-  color: var(--color-gray-dark);
+  color: #5f6d84;
 }
 
 .discovery-error {
-  color: var(--color-error);
+  color: #d02f2f;
+  margin-bottom: 12px;
 }
 
 @media (max-width: 900px) {
   .discovery-search-form {
     grid-template-columns: 1fr;
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .discovery-search-form .btn-primary,
+  .discovery-search-form .btn-secondary {
+    width: 100%;
   }
 }
