@@ -45,7 +45,14 @@ app.set('trust proxy', 1);
 // Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(helmet());
+// Allow assets (e.g. /uploads) to be requested cross-origin by the frontend domain.
+// Otherwise Chrome can block them with net::ERR_BLOCKED_BY_RESPONSE.NotSameOrigin.
+app.use(
+    helmet({
+        crossOriginResourcePolicy: { policy: 'cross-origin' },
+        crossOriginEmbedderPolicy: false,
+    })
+);
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,

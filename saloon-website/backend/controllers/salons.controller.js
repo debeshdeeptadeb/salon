@@ -219,6 +219,17 @@ export const discoverSalons = async (req, res, next) => {
             data: result.rows,
         });
     } catch (e) {
+        // Friendly hint for production when DB is missing required migrations/tables.
+        // Common Postgres codes:
+        // - 42P01: undefined_table
+        // - 42703: undefined_column
+        if (e?.code === '42P01' || e?.code === '42703') {
+            return res.status(500).json({
+                success: false,
+                error:
+                    'Search is not available because the database schema is missing required migrations (salons/location fields). Apply migrations 007, 008 (and 009 if needed) on the production database, then redeploy.',
+            });
+        }
         next(e);
     }
 };
