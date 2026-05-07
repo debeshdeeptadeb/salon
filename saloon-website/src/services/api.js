@@ -67,12 +67,17 @@ api.interceptors.response.use(
 export const salonsAPI = {
     list: () => api.get('/salons'),
     create: (data) => api.post('/salons', data),
+    getOne: (id) => api.get(`/salons/${id}`),
+    patch: (id, data) => api.patch(`/salons/${id}`, data),
     getPublic: (slug) => api.get(`/salons/public/${slug}`),
     discover: (params) => api.get('/salons/discover', { params }),
 };
 
 export const salonStaffAPI = {
+    /** Per-salon list (salon_admin or super with salonId) */
     list: (salonId) => api.get('/salon-staff', { params: { salonId } }),
+    /** Super admin: every salon_admin with salon_name / salon_slug */
+    listAll: () => api.get('/salon-staff', { params: { all: 1 } }),
     create: (data) => api.post('/salon-staff', data),
     delete: (id) => api.delete(`/salon-staff/${id}`),
 };

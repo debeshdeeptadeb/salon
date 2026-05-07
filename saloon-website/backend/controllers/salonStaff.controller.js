@@ -2,9 +2,21 @@ import bcrypt from 'bcryptjs';
 import pool from '../config/database.js';
 
 // @desc    List salon admins (staff)
-// @route   GET /api/salon-staff?salonId=
+// @route   GET /api/salon-staff?salonId= | ?all=1 (super admin: all tenants + salon name)
 export const listSalonStaff = async (req, res, next) => {
     try {
+        if (req.user.role === 'super_admin' && (req.query.all === '1' || req.query.all === 'true')) {
+            const result = await pool.query(
+                `SELECT a.id, a.email, a.name, a.role, a.salon_id, a.created_at,
+                        s.name AS salon_name, s.slug AS salon_slug
+                 FROM admins a
+                 INNER JOIN salons s ON s.id = a.salon_id
+                 WHERE a.role = 'salon_admin'
+                 ORDER BY s.name ASC, a.name ASC`
+            );
+            return res.status(200).json({ success: true, data: result.rows });
+        }
+
         let salonId;
         if (req.user.role === 'super_admin') {
             const raw = req.query.salonId || req.headers['x-salon-id'];

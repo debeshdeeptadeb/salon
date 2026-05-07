@@ -1,5 +1,27 @@
 import pool from '../config/database.js';
 
+const MAPS_URL_MAX = 2048;
+
+/** Accept empty; otherwise require http(s) URL (Google Maps share links). */
+function normalizeGoogleMapsUrl(raw) {
+    if (raw == null) return null;
+    const s = String(raw).trim();
+    if (!s) return null;
+    if (s.length > MAPS_URL_MAX) {
+        throw new Error('MAPS_URL_TOO_LONG');
+    }
+    if (!/^https?:\/\//i.test(s)) {
+        throw new Error('MAPS_URL_INVALID');
+    }
+    try {
+        // eslint-disable-next-line no-new
+        new URL(s);
+    } catch {
+        throw new Error('MAPS_URL_INVALID');
+    }
+    return s;
+}
+
 function slugify(name) {
     return name
         .toLowerCase()
@@ -83,7 +105,8 @@ async function seedNewSalonContent(client, salonId, displayName) {
 export const listSalons = async (req, res, next) => {
     try {
         const result = await pool.query(
-            `SELECT id, name, slug, area, city, state, pincode, latitude, longitude, is_active, created_at
+            `SELECT id, name, slug, area, city, state, pincode, latitude, longitude,
+                    google_maps_url, is_active, created_at
              FROM salons
              ORDER BY name ASC`
         );
@@ -123,19 +146,22 @@ export const discoverSalons = async (req, res, next) => {
                 sv.name AS service_name,
                 sv.price AS service_price,
                 sv.duration AS service_duration,
-                (
-                  6371 * acos(
-                    LEAST(
-                      1,
-                      GREATEST(
-                        -1,
-                        cos(radians($3)) * cos(radians(COALESCE(s.latitude, $3))) *
-                        cos(radians(COALESCE(s.longitude, $4)) - radians($4)) +
-                        sin(radians($3)) * sin(radians(COALESCE(s.latitude, $3)))
+                CASE
+                  WHEN s.latitude IS NULL OR s.longitude IS NULL OR $3::float8 IS NULL OR $4::float8 IS NULL THEN NULL
+                  ELSE (
+                    6371 * acos(
+                      LEAST(
+                        1,
+                        GREATEST(
+                          -1,
+                          cos(radians($3)) * cos(radians(s.latitude)) *
+                          cos(radians(s.longitude) - radians($4)) +
+                          sin(radians($3)) * sin(radians(s.latitude))
+                        )
                       )
                     )
                   )
-                ) AS distance_km
+                END AS distance_km
               FROM salons s
               LEFT JOIN services sv ON sv.salon_id = s.id AND sv.is_active = true
               LEFT JOIN service_categories sc ON sc.id = sv.category_id
@@ -176,7 +202,12 @@ export const discoverSalons = async (req, res, next) => {
             ORDER BY
               CASE WHEN $3 IS NULL OR $4 IS NULL THEN 0 ELSE 1 END DESC,
               CASE WHEN $3 IS NULL OR $4 IS NULL THEN name END ASC,
-              CASE WHEN $3 IS NOT NULL AND $4 IS NOT NULL THEN MIN(distance_km) END ASC NULLS LAST
+              CASE
+                WHEN $3 IS NOT NULL AND $4 IS NOT NULL AND MIN(distance_km) IS NULL THEN 1
+                ELSE 0
+              END ASC,
+              CASE WHEN $3 IS NOT NULL AND $4 IS NOT NULL THEN MIN(distance_km) END ASC NULLS LAST,
+              name ASC
             LIMIT $7
             `,
             [q, location, Number.isFinite(lat) ? lat : null, Number.isFinite(lng) ? lng : null, qLike, locLike, limit]
@@ -205,6 +236,7 @@ export const createSalon = async (req, res, next) => {
             pincode,
             latitude,
             longitude,
+            google_maps_url: mapsIn,
         } = req.body;
         if (!name?.trim()) {
             return res.status(400).json({ success: false, error: 'Name is required' });
@@ -215,12 +247,14 @@ export const createSalon = async (req, res, next) => {
             slug = `${slug}-${Date.now().toString(36)}`;
         }
 
+        const googleMapsUrl = normalizeGoogleMapsUrl(mapsIn);
+
         const client = await pool.connect();
         try {
             await client.query('BEGIN');
             const ins = await client.query(
-                `INSERT INTO salons (name, slug, area, city, state, pincode, latitude, longitude)
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                `INSERT INTO salons (name, slug, area, city, state, pincode, latitude, longitude, google_maps_url)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                  RETURNING *`,
                 [
                     name.trim(),
@@ -231,6 +265,7 @@ export const createSalon = async (req, res, next) => {
                     pincode?.trim() || null,
                     latitude ? Number(latitude) : null,
                     longitude ? Number(longitude) : null,
+                    googleMapsUrl,
                 ]
             );
             const salon = ins.rows[0];
@@ -244,6 +279,94 @@ export const createSalon = async (req, res, next) => {
             client.release();
         }
     } catch (e) {
+        if (e.message === 'MAPS_URL_TOO_LONG') {
+            return res.status(400).json({ success: false, error: 'Google Maps link is too long' });
+        }
+        if (e.message === 'MAPS_URL_INVALID') {
+            return res.status(400).json({
+                success: false,
+                error: 'Google Maps link must be a valid URL starting with http:// or https://',
+            });
+        }
+        next(e);
+    }
+};
+
+// @desc    Get one salon (super admin any id; salon_admin only own tenant)
+// @route   GET /api/salons/:id
+export const getSalonById = async (req, res, next) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        if (!Number.isFinite(id)) {
+            return res.status(400).json({ success: false, error: 'Invalid salon id' });
+        }
+        if (req.user.role === 'salon_admin') {
+            if (req.user.salon_id !== id) {
+                return res.status(403).json({ success: false, error: 'Not allowed' });
+            }
+        } else if (req.user.role !== 'super_admin') {
+            return res.status(403).json({ success: false, error: 'Not allowed' });
+        }
+
+        const result = await pool.query(
+            `SELECT id, name, slug, area, city, state, pincode, latitude, longitude, google_maps_url, is_active, created_at
+             FROM salons WHERE id = $1`,
+            [id]
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Salon not found' });
+        }
+        res.status(200).json({ success: true, data: result.rows[0] });
+    } catch (e) {
+        next(e);
+    }
+};
+
+// @desc    Update salon (maps link); super admin any tenant, salon_admin own only
+// @route   PATCH /api/salons/:id
+export const patchSalon = async (req, res, next) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        if (!Number.isFinite(id)) {
+            return res.status(400).json({ success: false, error: 'Invalid salon id' });
+        }
+        if (req.user.role === 'salon_admin') {
+            if (req.user.salon_id !== id) {
+                return res.status(403).json({ success: false, error: 'Not allowed' });
+            }
+        } else if (req.user.role !== 'super_admin') {
+            return res.status(403).json({ success: false, error: 'Not allowed' });
+        }
+
+        if (!Object.prototype.hasOwnProperty.call(req.body || {}, 'google_maps_url')) {
+            return res.status(400).json({ success: false, error: 'google_maps_url is required' });
+        }
+
+        let googleMapsUrl;
+        try {
+            googleMapsUrl = normalizeGoogleMapsUrl(req.body.google_maps_url);
+        } catch (e) {
+            if (e.message === 'MAPS_URL_TOO_LONG') {
+                return res.status(400).json({ success: false, error: 'Google Maps link is too long' });
+            }
+            return res.status(400).json({
+                success: false,
+                error: 'Google Maps link must be a valid URL starting with http:// or https://',
+            });
+        }
+
+        const result = await pool.query(
+            `UPDATE salons
+             SET google_maps_url = $1, updated_at = CURRENT_TIMESTAMP
+             WHERE id = $2
+             RETURNING id, name, slug, area, city, state, pincode, latitude, longitude, google_maps_url, is_active, created_at`,
+            [googleMapsUrl, id]
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Salon not found' });
+        }
+        res.status(200).json({ success: true, data: result.rows[0] });
+    } catch (e) {
         next(e);
     }
 };
@@ -253,7 +376,7 @@ export const createSalon = async (req, res, next) => {
 export const getPublicSalon = async (req, res, next) => {
     try {
         const result = await pool.query(
-            `SELECT id, name, slug, area, city, state, pincode, latitude, longitude
+            `SELECT id, name, slug, area, city, state, pincode, latitude, longitude, google_maps_url
              FROM salons
              WHERE slug = $1 AND is_active = true`,
             [req.params.slug]
