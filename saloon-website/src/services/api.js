@@ -1,9 +1,22 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+function inferApiBase() {
+    const envUrl = import.meta.env.VITE_API_URL;
+    if (envUrl) return envUrl;
+
+    // In production, default to same-origin API to avoid "calling localhost" from users' browsers.
+    if (import.meta.env.PROD && typeof window !== 'undefined' && window.location?.origin) {
+        return `${window.location.origin}/api`;
+    }
+
+    // Local dev fallback
+    return 'http://localhost:5000/api';
+}
+
+const API_URL = inferApiBase();
 
 /** Backend origin for static files (e.g. /uploads). VITE_API_URL is the API base and often ends with /api. */
-export const API_ORIGIN = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/?api\/?$/, '') || 'http://localhost:5000';
+export const API_ORIGIN = (API_URL || 'http://localhost:5000/api').replace(/\/?api\/?$/, '') || 'http://localhost:5000';
 
 // Create axios instance
 const api = axios.create({
