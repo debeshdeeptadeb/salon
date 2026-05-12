@@ -1,10 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiArrowRight } from "react-icons/fi";
-import { FaCalendarAlt, FaClock, FaMedal, FaRegSmile, FaWhatsapp } from "react-icons/fa";
+import { FiArrowRight, FiTrendingUp } from "react-icons/fi";
+import { FaClock, FaMedal, FaRegSmile, FaWhatsapp } from "react-icons/fa";
 import { FaWandMagicSparkles } from "react-icons/fa6";
+import { HiOutlineScissors, HiOutlineSparkles, HiOutlineFaceSmile } from "react-icons/hi2";
 import "./Hero.css";
 import { homeContentAPI } from "../../services/api";
+
+const trendingServices = [
+    { id: 1, title: "Haircut + Styling", duration: "45 min", price: 699, Icon: HiOutlineScissors, badge: "Most loved" },
+    { id: 2, title: "Glow Facial", duration: "60 min", price: 1199, Icon: HiOutlineSparkles, badge: "Editor's pick" },
+    { id: 3, title: "Beard + Cleanup", duration: "30 min", price: 499, Icon: HiOutlineFaceSmile, badge: "Quick & easy" },
+];
 
 export default function Hero() {
   const navigate = useNavigate();
@@ -116,54 +123,49 @@ export default function Hero() {
         </div>
 
         {/* Hero Visual */}
-        <div className="hero-visual">
-          <div className="hero-image-container">
-            {/* Relatable Service Highlights */}
-            <div className="hero-service-panel" aria-label="Popular services and quick booking info">
-              <div className="hero-service-panel-head">
-                <h3>Most Booked Today</h3>
-                <span>Updated live</span>
+        <aside className="hero-visual" aria-label="Trending services">
+          <div className="hero-service-panel">
+            <div className="hero-service-panel-head">
+              <div>
+                <span className="hero-service-eyebrow">
+                  <FiTrendingUp aria-hidden /> Trending
+                </span>
+                <h3>Most booked today</h3>
               </div>
-
-              <div className="hero-service-list">
-                <article className="hero-service-item">
-                  <div>
-                    <strong>Haircut + Styling</strong>
-                    <p>45 mins</p>
-                  </div>
-                  <span>₹699</span>
-                </article>
-
-                <article className="hero-service-item">
-                  <div>
-                    <strong>Glow Facial</strong>
-                    <p>60 mins</p>
-                  </div>
-                  <span>₹1199</span>
-                </article>
-
-                <article className="hero-service-item">
-                  <div>
-                    <strong>Beard + Cleanup</strong>
-                    <p>30 mins</p>
-                  </div>
-                  <span>₹499</span>
-                </article>
-              </div>
-
-              <div className="hero-service-footer">
-                <div className="hero-service-pill">
-                  <FaCalendarAlt aria-hidden="true" />
-                  <span>Slots available today</span>
-                </div>
-                <button className="hero-service-btn" onClick={() => navigate("/services")}>
-                  <span>View Services</span>
-                  <FiArrowRight size={18} aria-hidden="true" />
-                </button>
-              </div>
+              <span className="hero-service-live">
+                <span className="hero-service-live-dot" aria-hidden />
+                Live
+              </span>
             </div>
+
+            <div className="hero-service-list">
+              {trendingServices.map((svc, idx) => (
+                <article key={svc.id} className="hero-service-item" style={{ animationDelay: `${0.1 * idx}s` }}>
+                  <span className="hero-service-rank">{idx + 1}</span>
+                  <div className="hero-service-icon" aria-hidden>
+                    <svc.Icon />
+                  </div>
+                  <div className="hero-service-info">
+                    <strong>{svc.title}</strong>
+                    <p>
+                      <span className="hero-service-duration">{svc.duration}</span>
+                      <span className="hero-service-badge">{svc.badge}</span>
+                    </p>
+                  </div>
+                  <div className="hero-service-price">
+                    <span className="hero-service-price-from">from</span>
+                    <span className="hero-service-price-amount">₹{svc.price}</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <button className="hero-service-btn" onClick={() => navigate("/services")}>
+              <span>Explore all services</span>
+              <FiArrowRight size={18} aria-hidden />
+            </button>
           </div>
-        </div>
+        </aside>
       </div>
     </section>
   );
