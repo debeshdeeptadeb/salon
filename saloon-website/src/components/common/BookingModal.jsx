@@ -135,6 +135,30 @@ export default function BookingModal({ isOpen, onClose, service }) {
         if (!loading) { resetForm(); onClose(); }
     };
 
+    useEffect(() => {
+        if (!isOpen) return;
+        const prevBodyOverflow = document.body.style.overflow;
+        const prevHtmlOverflow = document.documentElement.style.overflow;
+        document.body.style.overflow = "hidden";
+        document.documentElement.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = prevBodyOverflow;
+            document.documentElement.style.overflow = prevHtmlOverflow;
+        };
+    }, [isOpen]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        const onKey = (e) => {
+            if (e.key === "Escape" && !loading) {
+                resetForm();
+                onClose();
+            }
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [isOpen, loading, onClose]);
+
     if (!isOpen || !service) return null;
 
     return (

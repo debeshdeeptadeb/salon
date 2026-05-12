@@ -338,6 +338,91 @@
   }
 
   .discovery-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .discovery-shell {
+    padding: 1.1rem 1rem 1.25rem;
+    border-radius: 16px;
+  }
+
+  .discovery-search-header {
+    margin-bottom: 1rem;
+  }
+
+  .discovery-eyebrow {
+    font-size: 0.66rem;
+    letter-spacing: 0.18em;
+  }
+
+  .discovery-search-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .discovery-lead {
+    font-size: 0.86rem;
+    line-height: 1.5;
+  }
+
+  .discovery-search-form input {
+    min-height: 44px;
+    font-size: 0.9rem;
+    border-radius: 10px;
+  }
+
+  .discovery-label {
+    font-size: 0.66rem;
+  }
+
+  .discovery-btn {
+    min-height: 46px;
+    font-size: 0.84rem;
+    border-radius: 10px;
+  }
+
+  .discovery-card {
+    padding: 1rem;
+    border-radius: 14px;
+  }
+
+  .discovery-card-top h3 {
+    font-size: 1rem;
+  }
+
+  .discovery-card-address {
+    font-size: 0.82rem;
+  }
+
+  .discovery-service-item {
+    padding: 10px 12px;
+  }
+
+  .discovery-service-item strong {
+    font-size: 0.88rem;
+  }
+
+  .discovery-service-item span {
+    font-size: 0.76rem;
+  }
+
+  .discovery-book-btn {
+    padding: 0.45rem 0.8rem;
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .discovery-actions {
     grid-template-columns: 1fr;
+  }
+
+  .discovery-shell {
+    padding: 1rem 0.85rem 1.1rem;
+  }
+
+  .discovery-search-header h2 {
+    font-size: 1.25rem;
   }
 }

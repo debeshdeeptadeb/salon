@@ -4,18 +4,21 @@
 
 .booking-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(8px);
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 10000;
     padding: 20px;
-    animation: fadeIn 0.3s ease;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    animation: fadeIn 0.25s ease;
 }
 
 @keyframes fadeIn {
@@ -33,8 +36,10 @@
     border-radius: 24px;
     max-width: 600px;
     width: 100%;
-    max-height: 90vh;
+    max-height: min(90vh, 90dvh);
     overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     position: relative;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(212, 175, 55, 0.2);
@@ -322,21 +327,28 @@
     flex-shrink: 0;
 }
 
-/* Responsive Design */
+/* Responsive Design — tablet & phone (centered card style, not bottom-sheet) */
 @media (max-width: 768px) {
     .booking-modal-overlay {
-        padding: 0;
-        align-items: flex-end;
+        padding: 16px;
+        align-items: center;
     }
 
     .booking-modal {
         max-width: 100%;
-        border-radius: 20px 20px 0 0;
-        max-height: 92vh;
+        border-radius: 18px;
+        max-height: min(88vh, 88dvh);
+    }
+
+    .modal-close {
+        top: 14px;
+        right: 14px;
+        width: 36px;
+        height: 36px;
     }
 
     .modal-header {
-        padding: 28px 22px 18px;
+        padding: 26px 22px 18px;
     }
 
     .modal-header h2 {
@@ -346,6 +358,14 @@
 
     .service-info h3 {
         font-size: 17px;
+        margin-bottom: 8px;
+    }
+
+    .service-meta {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
     }
 
     .service-meta .price {
@@ -353,7 +373,7 @@
     }
 
     .booking-form {
-        padding: 18px 22px 26px;
+        padding: 18px 22px 24px;
     }
 
     .form-group {
@@ -369,42 +389,39 @@
     .form-group input,
     .form-group select,
     .form-group textarea {
-        padding: 11px 13px;
-        font-size: 14px;
+        padding: 12px 14px;
+        font-size: 14.5px;
         border-radius: 10px;
     }
 
     .form-row {
-        grid-template-columns: 1fr;
-        gap: 0;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
     }
 
     .btn-submit {
         padding: 14px 20px;
         font-size: 14px;
-        margin-top: 20px;
+        margin-top: 18px;
         letter-spacing: 0.5px;
-    }
-
-    .service-meta {
-        flex-direction: row;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
     }
 }
 
 @media (max-width: 480px) {
+    .booking-modal-overlay {
+        padding: 10px;
+    }
+
     .booking-modal {
-        border-radius: 16px 16px 0 0;
-        max-height: 94vh;
+        border-radius: 16px;
+        max-height: min(92vh, 92dvh);
     }
 
     .modal-close {
-        top: 14px;
-        right: 14px;
-        width: 34px;
-        height: 34px;
+        top: 12px;
+        right: 12px;
+        width: 32px;
+        height: 32px;
     }
 
     .modal-header {
@@ -412,13 +429,13 @@
     }
 
     .modal-header h2 {
-        font-size: 20px;
-        margin-bottom: 12px;
+        font-size: 19px;
+        margin-bottom: 10px;
     }
 
     .service-info h3 {
-        font-size: 16px;
-        margin-bottom: 8px;
+        font-size: 15px;
+        margin-bottom: 6px;
     }
 
     .service-meta .price {
@@ -426,21 +443,22 @@
     }
 
     .service-meta .duration {
-        font-size: 12px;
-        padding: 4px 10px;
+        font-size: 11px;
+        padding: 3px 9px;
     }
 
     .booking-form {
-        padding: 14px 18px 22px;
+        padding: 14px 16px 20px;
     }
 
     .form-group {
-        margin-bottom: 14px;
+        margin-bottom: 13px;
     }
 
     .form-group label {
         font-size: 11px;
         margin-bottom: 5px;
+        letter-spacing: 0.2px;
     }
 
     .form-group input,
@@ -452,7 +470,12 @@
     }
 
     .form-group textarea {
-        min-height: 64px;
+        min-height: 60px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
     }
 
     .error-message {
@@ -460,10 +483,40 @@
     }
 
     .btn-submit {
-        padding: 13px 18px;
-        font-size: 13.5px;
-        margin-top: 16px;
+        padding: 12px 16px;
+        font-size: 13px;
+        margin-top: 14px;
         border-radius: 10px;
+        letter-spacing: 0.4px;
+    }
+}
+
+@media (max-width: 360px) {
+    .booking-modal-overlay {
+        padding: 6px;
+    }
+
+    .modal-header {
+        padding: 18px 14px 12px;
+    }
+
+    .modal-header h2 {
+        font-size: 17px;
+    }
+
+    .booking-form {
+        padding: 12px 14px 18px;
+    }
+
+    .form-group {
+        margin-bottom: 11px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 9px 11px;
+        font-size: 13.5px;
     }
 }
 
@@ -751,7 +804,7 @@ select option {
 @media (max-width: 768px) {
     .bm-steps {
         padding: 18px 22px 0;
-        gap: 4px;
+        gap: 6px;
     }
 
     .bm-step {
@@ -766,7 +819,7 @@ select option {
     }
 
     .bm-payment {
-        padding: 16px 22px 26px;
+        padding: 16px 22px 24px;
     }
 
     .bm-pay-sub {
@@ -817,7 +870,7 @@ select option {
 
 @media (max-width: 480px) {
     .bm-steps {
-        padding: 14px 18px 0;
+        padding: 14px 16px 0;
     }
 
     .bm-step {
@@ -825,14 +878,32 @@ select option {
     }
 
     .bm-step-num {
-        width: 24px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
         font-size: 11px;
         border-width: 1.5px;
     }
 
+    .bm-step::after {
+        top: 11px;
+    }
+
     .bm-payment {
-        padding: 14px 18px 22px;
+        padding: 14px 16px 20px;
+    }
+
+    .bm-pay-sub {
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
+
+    .bm-upi-amount {
+        font-size: 14px;
+        margin-bottom: 14px;
+    }
+
+    .bm-upi-amount strong {
+        font-size: 22px;
     }
 
     .bm-qr-img,
@@ -842,17 +913,18 @@ select option {
     }
 
     .bm-qr-wrap {
-        padding: 12px;
+        padding: 10px;
+        border-radius: 12px;
     }
 
     .bm-upi-id {
-        font-size: 13px;
+        font-size: 12.5px;
         padding: 6px 12px;
     }
 
     .bm-pay-steps {
         gap: 6px;
-        margin-bottom: 18px;
+        margin-bottom: 16px;
     }
 
     .bm-pay-step {
@@ -866,13 +938,41 @@ select option {
 
     .success-icon-big {
         font-size: 46px;
+        margin-bottom: 10px;
     }
 
     .submit-success-full h2 {
         font-size: 20px;
     }
 
+    .submit-success-full p {
+        font-size: 13px;
+        margin-bottom: 14px;
+    }
+
     .bm-booking-summary {
         padding: 14px;
+        gap: 8px;
+    }
+
+    .bm-booking-summary div {
+        font-size: 12.5px;
+    }
+
+    .btn-back {
+        padding: 10px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 360px) {
+    .bm-qr-img,
+    .bm-qr-placeholder {
+        width: 130px;
+        height: 130px;
+    }
+
+    .bm-step {
+        font-size: 9.5px;
     }
 }

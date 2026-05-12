@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiArrowRight } from "react-icons/fi";
-import { FaCalendarAlt, FaCrown, FaClock, FaGem, FaMedal, FaRegSmile, FaStar, FaWhatsapp } from "react-icons/fa";
+import { FaCalendarAlt, FaClock, FaMedal, FaRegSmile, FaWhatsapp } from "react-icons/fa";
 import { FaWandMagicSparkles } from "react-icons/fa6";
 import "./Hero.css";
 import { homeContentAPI } from "../../services/api";
@@ -118,14 +118,6 @@ export default function Hero() {
         {/* Hero Visual */}
         <div className="hero-visual">
           <div className="hero-image-container">
-            {/* Decorative Frame */}
-            <div className="hero-frame">
-              <div className="frame-corner frame-corner-tl"></div>
-              <div className="frame-corner frame-corner-tr"></div>
-              <div className="frame-corner frame-corner-bl"></div>
-              <div className="frame-corner frame-corner-br"></div>
-            </div>
-
             {/* Relatable Service Highlights */}
             <div className="hero-service-panel" aria-label="Popular services and quick booking info">
               <div className="hero-service-panel-head">
@@ -170,36 +162,8 @@ export default function Hero() {
                 </button>
               </div>
             </div>
-
-            {/* Floating Elements */}
-            <div className="floating-element floating-element-1">
-              <div className="element-icon" aria-hidden="true">
-                <FaGem />
-              </div>
-              <div className="element-text">Premium Quality</div>
-            </div>
-            <div className="floating-element floating-element-2">
-              <div className="element-icon" aria-hidden="true">
-                <FaStar />
-              </div>
-              <div className="element-text">Expert Stylists</div>
-            </div>
-            <div className="floating-element floating-element-3">
-              <div className="element-icon" aria-hidden="true">
-                <FaCrown />
-              </div>
-              <div className="element-text">Luxury Experience</div>
-            </div>
           </div>
         </div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="scroll-indicator">
-        <div className="scroll-mouse">
-          <div className="scroll-wheel"></div>
-        </div>
-        <span className="scroll-text">Scroll to explore</span>
       </div>
     </section>
   );

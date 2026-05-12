@@ -1,5 +1,5 @@
-import OfferBar from "../components/common/OfferBar";
 import Hero from "../components/home/Hero";
+import WhyUs from "../components/home/WhyUs";
 import DiscoverySearch from "../components/home/DiscoverySearch";
 import ServicesPreview from "../components/home/ServicesPreview";
 import PricePreview from "../components/home/PricePreview";
@@ -9,12 +9,15 @@ import "./home.css"
 
 export default function Home() {
   return (
-    <main className="home-page"> 
-      {/* <OfferBar /> */}
+    <main className="home-page">
       <Hero />
 
       <section className="home-section home-section-search">
         <DiscoverySearch />
+      </section>
+
+      <section className="home-section home-section-whyus">
+        <WhyUs />
       </section>
 
       <section className="home-section home-section-services">
