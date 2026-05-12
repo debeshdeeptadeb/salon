@@ -139,8 +139,15 @@
 
 .login-footer p {
     color: #666;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     margin: 4px 0;
+    font-weight: 500;
+}
+
+.login-footer .login-footer-help {
+    font-size: 0.82rem;
+    color: #888;
+    font-weight: 400;
 }
 
 .login-footer strong {

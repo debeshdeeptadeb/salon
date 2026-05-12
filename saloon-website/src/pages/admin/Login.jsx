@@ -63,7 +63,7 @@ export default function Login() {
                                 value={credentials.email}
                                 onChange={handleChange}
                                 required
-                                placeholder="admin@minjalsalon.com"
+                                placeholder="you@example.com"
                                 autoComplete="email"
                             />
                         </div>
@@ -92,9 +92,10 @@ export default function Login() {
                     </form>
 
                     <div className="login-footer">
-                        <p>Default credentials:</p>
-                        <p><strong>Email:</strong> admin@minjalsalon.com</p>
-                        <p><strong>Password:</strong> Admin@123</p>
+                        <p>Authorized personnel only.</p>
+                        <p className="login-footer-help">
+                            Forgot your password? Contact the platform administrator.
+                        </p>
                     </div>
                 </div>
             </div>

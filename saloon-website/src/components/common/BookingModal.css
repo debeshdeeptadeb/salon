@@ -324,22 +324,54 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .booking-modal-overlay {
+        padding: 0;
+        align-items: flex-end;
+    }
+
     .booking-modal {
         max-width: 100%;
         border-radius: 20px 20px 0 0;
-        max-height: 95vh;
+        max-height: 92vh;
     }
 
     .modal-header {
-        padding: 30px 24px 20px;
+        padding: 28px 22px 18px;
     }
 
     .modal-header h2 {
-        font-size: 24px;
+        font-size: 22px;
+        margin-bottom: 14px;
+    }
+
+    .service-info h3 {
+        font-size: 17px;
+    }
+
+    .service-meta .price {
+        font-size: 20px;
     }
 
     .booking-form {
-        padding: 20px 24px 30px;
+        padding: 18px 22px 26px;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-group label {
+        font-size: 12px;
+        margin-bottom: 6px;
+        letter-spacing: 0.3px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 11px 13px;
+        font-size: 14px;
+        border-radius: 10px;
     }
 
     .form-row {
@@ -347,10 +379,91 @@
         gap: 0;
     }
 
+    .btn-submit {
+        padding: 14px 20px;
+        font-size: 14px;
+        margin-top: 20px;
+        letter-spacing: 0.5px;
+    }
+
     .service-meta {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .booking-modal {
+        border-radius: 16px 16px 0 0;
+        max-height: 94vh;
+    }
+
+    .modal-close {
+        top: 14px;
+        right: 14px;
+        width: 34px;
+        height: 34px;
+    }
+
+    .modal-header {
+        padding: 22px 18px 14px;
+    }
+
+    .modal-header h2 {
+        font-size: 20px;
+        margin-bottom: 12px;
+    }
+
+    .service-info h3 {
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+
+    .service-meta .price {
+        font-size: 18px;
+    }
+
+    .service-meta .duration {
+        font-size: 12px;
+        padding: 4px 10px;
+    }
+
+    .booking-form {
+        padding: 14px 18px 22px;
+    }
+
+    .form-group {
+        margin-bottom: 14px;
+    }
+
+    .form-group label {
+        font-size: 11px;
+        margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 10px 12px;
+        font-size: 14px;
+        border-radius: 9px;
+    }
+
+    .form-group textarea {
+        min-height: 64px;
+    }
+
+    .error-message {
+        font-size: 12px;
+    }
+
+    .btn-submit {
+        padding: 13px 18px;
+        font-size: 13.5px;
+        margin-top: 16px;
+        border-radius: 10px;
     }
 }
 
@@ -637,20 +750,129 @@ select option {
 
 @media (max-width: 768px) {
     .bm-steps {
-        padding: 16px 24px 0;
+        padding: 18px 22px 0;
+        gap: 4px;
+    }
+
+    .bm-step {
+        font-size: 11px;
+        letter-spacing: 0.3px;
+    }
+
+    .bm-step-num {
+        width: 26px;
+        height: 26px;
+        font-size: 12px;
     }
 
     .bm-payment {
-        padding: 16px 24px 30px;
+        padding: 16px 22px 26px;
+    }
+
+    .bm-pay-sub {
+        font-size: 13px;
+    }
+
+    .bm-upi-amount {
+        font-size: 16px;
+    }
+
+    .bm-upi-amount strong {
+        font-size: 24px;
     }
 
     .bm-qr-img,
     .bm-qr-placeholder {
-        width: 160px;
-        height: 160px;
+        width: 170px;
+        height: 170px;
+    }
+
+    .bm-pay-step {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+
+    .bm-booking-summary {
+        padding: 16px;
+        gap: 10px;
+    }
+
+    .bm-booking-summary div {
+        font-size: 13px;
     }
 
     .submit-success-full {
-        padding: 24px;
+        padding: 22px 18px;
+    }
+
+    .submit-success-full h2 {
+        font-size: 22px;
+    }
+
+    .success-icon-big {
+        font-size: 52px;
+        margin-bottom: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .bm-steps {
+        padding: 14px 18px 0;
+    }
+
+    .bm-step {
+        font-size: 10px;
+    }
+
+    .bm-step-num {
+        width: 24px;
+        height: 24px;
+        font-size: 11px;
+        border-width: 1.5px;
+    }
+
+    .bm-payment {
+        padding: 14px 18px 22px;
+    }
+
+    .bm-qr-img,
+    .bm-qr-placeholder {
+        width: 150px;
+        height: 150px;
+    }
+
+    .bm-qr-wrap {
+        padding: 12px;
+    }
+
+    .bm-upi-id {
+        font-size: 13px;
+        padding: 6px 12px;
+    }
+
+    .bm-pay-steps {
+        gap: 6px;
+        margin-bottom: 18px;
+    }
+
+    .bm-pay-step {
+        font-size: 12.5px;
+        padding: 8px 11px;
+    }
+
+    .submit-success-full {
+        padding: 20px 16px;
+    }
+
+    .success-icon-big {
+        font-size: 46px;
+    }
+
+    .submit-success-full h2 {
+        font-size: 20px;
+    }
+
+    .bm-booking-summary {
+        padding: 14px;
     }
 }
