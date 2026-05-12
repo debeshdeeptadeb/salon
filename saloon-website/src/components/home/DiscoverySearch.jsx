@@ -75,7 +75,10 @@ export default function DiscoverySearch() {
   };
 
   const openBooking = (service, salon) => {
-    localStorage.setItem("publicSalonSlug", salon.slug);
+    if (salon?.slug) {
+      localStorage.setItem("publicSalonSlug", salon.slug);
+      window.dispatchEvent(new Event("publicSalonChanged"));
+    }
     setSelectedService(service);
     setIsModalOpen(true);
   };

@@ -94,15 +94,21 @@ export default function NavbarSearch({ className = "" }) {
     inputRef.current?.focus();
   };
 
-  const openBooking = (service, salon) => {
+  const setPublicSalon = (salon) => {
+    if (!salon?.slug) return;
     localStorage.setItem("publicSalonSlug", salon.slug);
+    window.dispatchEvent(new Event("publicSalonChanged"));
+  };
+
+  const openBooking = (service, salon) => {
+    setPublicSalon(salon);
     setSelectedService(service);
     setIsModalOpen(true);
     setIsOpen(false);
   };
 
   const goToServices = (salon) => {
-    localStorage.setItem("publicSalonSlug", salon.slug);
+    setPublicSalon(salon);
     setIsOpen(false);
     setQuery("");
     setResults([]);

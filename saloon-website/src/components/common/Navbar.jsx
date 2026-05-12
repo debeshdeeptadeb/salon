@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import "./Navbar.css";
 import defaultLogo from "../../assets/logo/minjal-salon-logo.svg";
@@ -7,33 +7,69 @@ import { settingsAPI, API_ORIGIN } from "../../services/api";
 import NavbarSearch from "./NavbarSearch";
 
 export default function Navbar() {
+  const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [logo, setLogo] = useState(defaultLogo);
   const [siteName, setSiteName] = useState('MINJAL');
   const [siteTagline, setSiteTagline] = useState('Luxury Salon');
+  const [pinnedSalonSlug, setPinnedSalonSlug] = useState(() =>
+    typeof window === 'undefined' ? null : localStorage.getItem('publicSalonSlug')
+  );
+  const [pinnedSalonName, setPinnedSalonName] = useState(null);
   const WA_PHONE = "919337720521";
   const BOOKING_MESSAGE = "Hello Minjal Salon! I want to book an appointment. Please share available time slots. Thank you!";
   const WA_BOOK_LINK = `https://wa.me/${WA_PHONE}?text=${encodeURIComponent(BOOKING_MESSAGE)}`;
 
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const response = await settingsAPI.getSettings();
-        const data = response.data.data;
-        if (data.navbar_logo_url) {
-          setLogo(data.navbar_logo_url.startsWith('http') ? data.navbar_logo_url : `${API_ORIGIN}${data.navbar_logo_url}`);
-        }
-        if (data.site_name) setSiteName(data.site_name);
-        if (data.site_tagline) setSiteTagline(data.site_tagline);
-      } catch (error) {
-        console.error('Failed to fetch settings:', error);
-        // Use default values
+  const fetchSettings = useCallback(async () => {
+    try {
+      const response = await settingsAPI.getSettings();
+      const data = response.data.data;
+      if (data.navbar_logo_url) {
+        setLogo(
+          data.navbar_logo_url.startsWith('http')
+            ? data.navbar_logo_url
+            : `${API_ORIGIN}${data.navbar_logo_url}`
+        );
+      } else {
+        setLogo(defaultLogo);
       }
-    };
+      setSiteName(data.site_name || 'MINJAL');
+      setSiteTagline(data.site_tagline || 'Luxury Salon');
+      if (data.site_name && localStorage.getItem('publicSalonSlug')) {
+        setPinnedSalonName(data.site_name);
+      } else {
+        setPinnedSalonName(null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch settings:', error);
+    }
+  }, []);
 
+  useEffect(() => {
     fetchSettings();
+  }, [fetchSettings, location.pathname]);
+
+  useEffect(() => {
+    const sync = () => {
+      const slug = localStorage.getItem('publicSalonSlug');
+      setPinnedSalonSlug(slug);
+      fetchSettings();
+    };
+    window.addEventListener('publicSalonChanged', sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener('publicSalonChanged', sync);
+      window.removeEventListener('storage', sync);
+    };
+  }, [fetchSettings]);
+
+  const clearPinnedSalon = useCallback(() => {
+    if (localStorage.getItem('publicSalonSlug')) {
+      localStorage.removeItem('publicSalonSlug');
+      window.dispatchEvent(new Event('publicSalonChanged'));
+    }
   }, []);
 
   useEffect(() => {
@@ -55,6 +91,11 @@ export default function Navbar() {
     setIsMobileSearchOpen(false);
   };
 
+  const handleHomeClick = () => {
+    closeMobileMenu();
+    clearPinnedSalon();
+  };
+
   const toggleMobileSearch = () => {
     setIsMobileSearchOpen((prev) => !prev);
     if (isMobileMenuOpen) setIsMobileMenuOpen(false);
@@ -65,7 +106,7 @@ export default function Navbar() {
       <div className="container navbar-inner">
 
         {/* LOGO */}
-        <Link to="/" className="navbar-logo" onClick={closeMobileMenu}>
+        <Link to="/" className="navbar-logo" onClick={handleHomeClick}>
           <img src={logo} alt={siteName} />
           <span className="navbar-logo-text">
             <span className="logo-main">{siteName}</span>
@@ -78,7 +119,7 @@ export default function Navbar() {
 
         {/* DESKTOP NAV LINKS */}
         <nav className="navbar-links">
-          <Link to="/" className="nav-link">Home</Link>
+          <Link to="/" className="nav-link" onClick={handleHomeClick}>Home</Link>
           <Link to="/services" className="nav-link">Services</Link>
           <Link to="/catalogue" className="nav-link">Catalogue</Link>
           <Link to="/gallery" className="nav-link">Gallery</Link>
@@ -134,8 +175,26 @@ export default function Navbar() {
 
       {/* MOBILE MENU */}
       <div className={`mobile-menu ${isMobileMenuOpen ? 'active' : ''}`}>
+        {pinnedSalonSlug && (
+          <div className="mobile-menu-pinned">
+            <div className="mobile-menu-pinned-info">
+              <span className="mobile-menu-pinned-label">Viewing salon</span>
+              <strong>{pinnedSalonName || pinnedSalonSlug}</strong>
+            </div>
+            <button
+              type="button"
+              className="mobile-menu-pinned-btn"
+              onClick={() => {
+                clearPinnedSalon();
+                closeMobileMenu();
+              }}
+            >
+              Show all
+            </button>
+          </div>
+        )}
         <nav className="mobile-menu-links">
-          <Link to="/" className="mobile-nav-link" onClick={closeMobileMenu}>
+          <Link to="/" className="mobile-nav-link" onClick={handleHomeClick}>
             Home
           </Link>
           <Link to="/services" className="mobile-nav-link" onClick={closeMobileMenu}>
