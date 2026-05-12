@@ -11,6 +11,7 @@
         "migrate:007": "node scripts/run-migration-007.js",
         "migrate:008": "node scripts/run-migration-008.js",
         "migrate:009": "node scripts/run-migration-009.js",
+        "migrate:010": "node scripts/run-migration-010.js",
         "promote-super": "node scripts/promote-super-admin.js",
         "preflight:prod": "node scripts/preflight-production.js"
     },

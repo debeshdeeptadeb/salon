@@ -16,14 +16,67 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check if user is logged in on mount
-        const token = localStorage.getItem('adminToken');
-        const savedUser = localStorage.getItem('adminUser');
+        let cancelled = false;
 
-        if (token && savedUser) {
-            setUser(JSON.parse(savedUser));
+        async function hydrateUser() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                setUser(null);
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const response = await authAPI.getMe();
+                if (cancelled) return;
+                const userData = response.data?.data;
+                if (userData) {
+                    const stored = localStorage.getItem('adminUser');
+                    let prev = {};
+                    try {
+                        prev = stored ? JSON.parse(stored) : {};
+                    } catch {
+                        prev = {};
+                    }
+                    const merged = { ...prev, ...userData };
+                    localStorage.setItem('adminUser', JSON.stringify(merged));
+                    setUser(merged);
+
+                    if (merged.role === 'super_admin') {
+                        try {
+                            const res = await salonsAPI.list();
+                            const salons = res.data.data || [];
+                            if (salons.length && !localStorage.getItem('superAdminSalonId')) {
+                                localStorage.setItem('superAdminSalonId', String(salons[0].id));
+                            }
+                        } catch {
+                            /* ignore */
+                        }
+                    } else {
+                        localStorage.removeItem('superAdminSalonId');
+                    }
+                }
+            } catch {
+                if (cancelled) return;
+                const savedUser = localStorage.getItem('adminUser');
+                if (savedUser) {
+                    try {
+                        setUser(JSON.parse(savedUser));
+                    } catch {
+                        setUser(null);
+                    }
+                } else {
+                    setUser(null);
+                }
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
         }
-        setLoading(false);
+
+        hydrateUser();
+        return () => {
+            cancelled = true;
+        };
     }, []);
 
     const login = async (credentials) => {
