@@ -1,11 +1,54 @@
+import jwt from 'jsonwebtoken';
 import pool from '../config/database.js';
 
 /**
- * Resolves salon id from ?salon=slug (default: default). Sets req.publicSalonId.
- * Use on public routes that need tenant scope.
+ * Resolves the salon id this request should read from.
+ *
+ * Priority:
+ *   1. Authenticated admin:
+ *      - salon_admin  → req.user.salon_id  (their assigned tenant)
+ *      - super_admin  → X-Salon-Id header  (the tenant they switched to)
+ *   2. Public (no token) → ?salon=slug (defaults to 'default')
+ *
+ * Sets req.publicSalonId (and req.publicSalonSlug for the slug-based path).
  */
 export const publicSalonFromQuery = async (req, res, next) => {
     try {
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith('Bearer')) {
+            const token = authHeader.split(' ')[1];
+            try {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                const r = await pool.query(
+                    `SELECT a.id, a.role, a.salon_id, s.slug AS salon_slug
+                     FROM admins a
+                     LEFT JOIN salons s ON s.id = a.salon_id
+                     WHERE a.id = $1`,
+                    [decoded.id]
+                );
+                if (r.rows.length) {
+                    const admin = r.rows[0];
+                    if (admin.role === 'salon_admin' && admin.salon_id) {
+                        req.publicSalonId = admin.salon_id;
+                        req.publicSalonSlug = admin.salon_slug || null;
+                        return next();
+                    }
+                    if (admin.role === 'super_admin') {
+                        const raw = req.headers['x-salon-id'];
+                        if (raw) {
+                            const id = parseInt(raw, 10);
+                            if (Number.isFinite(id)) {
+                                req.publicSalonId = id;
+                                return next();
+                            }
+                        }
+                    }
+                }
+            } catch {
+                /* token invalid / expired — fall through to slug-based path */
+            }
+        }
+
         const slug = req.query.salon || req.body?.salon || 'default';
         const result = await pool.query(
             'SELECT id FROM salons WHERE slug = $1 AND is_active = true',
