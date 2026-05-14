@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiArrowRight, FiTrendingUp } from "react-icons/fi";
 import { FaClock, FaMedal, FaRegSmile, FaWhatsapp } from "react-icons/fa";
@@ -6,6 +6,8 @@ import { FaWandMagicSparkles } from "react-icons/fa6";
 import { HiOutlineScissors, HiOutlineSparkles, HiOutlineFaceSmile } from "react-icons/hi2";
 import "./Hero.css";
 import { homeContentAPI } from "../../services/api";
+import SalonPicker from "./SalonPicker";
+import { useOnPublicSalonChange } from "../../hooks/useOnPublicSalonChange";
 
 const trendingServices = [
     { id: 1, title: "Haircut + Styling", duration: "45 min", price: 699, Icon: HiOutlineScissors, badge: "Most loved" },
@@ -29,7 +31,7 @@ export default function Hero() {
     stat_services: 50
   });
 
-  useEffect(() => {
+  useOnPublicSalonChange(() => {
     const fetchHeroContent = async () => {
       try {
         const response = await homeContentAPI.getHero();
@@ -39,9 +41,8 @@ export default function Hero() {
         // Use default values
       }
     };
-
     fetchHeroContent();
-  }, []);
+  });
 
   return (
     <section className="hero">
@@ -54,6 +55,8 @@ export default function Hero() {
 
       <div className="container hero-container">
         <div className="hero-content">
+          <SalonPicker />
+
           {/* Luxury Badge */}
           <div className="hero-badge fade-in">
             <span className="badge-icon" aria-hidden="true">

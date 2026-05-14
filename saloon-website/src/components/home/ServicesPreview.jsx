@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./ServicesPreview.css";
 import { homeContentAPI } from "../../services/api";
+import { useOnPublicSalonChange } from "../../hooks/useOnPublicSalonChange";
 import { FiArrowRight } from "react-icons/fi";
 import { FaCut, FaGem, FaHandSparkles, FaRing, FaSpa, FaStar } from "react-icons/fa";
 import { FaWandMagicSparkles } from "react-icons/fa6";
@@ -59,7 +60,7 @@ export default function ServicesPreview() {
   const [activeService, setActiveService] = useState(0);
   const [services, setServices] = useState(defaultServices);
 
-  useEffect(() => {
+  useOnPublicSalonChange(() => {
     const fetchServices = async () => {
       try {
         const response = await homeContentAPI.getServices();
@@ -74,7 +75,7 @@ export default function ServicesPreview() {
     };
 
     fetchServices();
-  }, []);
+  });
 
   useEffect(() => {
     if (!services.length) return;

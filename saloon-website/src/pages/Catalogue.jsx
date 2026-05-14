@@ -1,17 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { catalogueAPI, API_ORIGIN } from '../services/api';
 import './Catalogue.css';
+import { useOnPublicSalonChange } from '../hooks/useOnPublicSalonChange';
 
 export default function Catalogue() {
     const [catalogueItems, setCatalogueItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedItem, setSelectedItem] = useState(null);
 
-    useEffect(() => {
-        fetchCatalogueItems();
-    }, []);
-
-    const fetchCatalogueItems = async () => {
+    const fetchCatalogueItems = useCallback(async () => {
+        setLoading(true);
         try {
             const response = await catalogueAPI.getAll();
             setCatalogueItems(response.data.data);
@@ -20,7 +18,11 @@ export default function Catalogue() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useOnPublicSalonChange(() => {
+        fetchCatalogueItems();
+    });
 
     if (loading) {
         return (

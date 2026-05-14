@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import "./Footer.css";
 import defaultLogo from "../../assets/logo/minjal-salon-logo.svg";
 import { settingsAPI, API_ORIGIN } from "../../services/api";
+import { useOnPublicSalonChange } from "../../hooks/useOnPublicSalonChange";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -10,24 +11,24 @@ export default function Footer() {
   const [siteName, setSiteName] = useState('MINJAL');
   const [siteTagline, setSiteTagline] = useState('Luxury Salon');
 
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const response = await settingsAPI.getSettings();
-        const data = response.data.data;
-        if (data.footer_logo_url) {
-          setLogo(data.footer_logo_url.startsWith('http') ? data.footer_logo_url : `${API_ORIGIN}${data.footer_logo_url}`);
-        }
-        if (data.site_name) setSiteName(data.site_name);
-        if (data.site_tagline) setSiteTagline(data.site_tagline);
-      } catch (error) {
-        console.error('Failed to fetch settings:', error);
-        // Use default values
+  const fetchSettings = useCallback(async () => {
+    try {
+      const response = await settingsAPI.getSettings();
+      const data = response.data.data;
+      if (data.footer_logo_url) {
+        setLogo(data.footer_logo_url.startsWith('http') ? data.footer_logo_url : `${API_ORIGIN}${data.footer_logo_url}`);
       }
-    };
-
-    fetchSettings();
+      if (data.site_name) setSiteName(data.site_name);
+      if (data.site_tagline) setSiteTagline(data.site_tagline);
+    } catch (error) {
+      console.error('Failed to fetch settings:', error);
+      // Use default values
+    }
   }, []);
+
+  useOnPublicSalonChange(() => {
+    fetchSettings();
+  });
 
   return (
     <footer className="footer">

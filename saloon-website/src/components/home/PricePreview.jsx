@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./PricePreview.css";
 import { homeContentAPI } from "../../services/api";
+import { useOnPublicSalonChange } from "../../hooks/useOnPublicSalonChange";
 import { FiArrowRight } from "react-icons/fi";
 
 const defaultPrices = [
@@ -15,7 +16,7 @@ export default function PricePreview() {
   const [prices, setPrices] = useState(defaultPrices);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  useOnPublicSalonChange(() => {
     const fetchPrices = async () => {
       try {
         const response = await homeContentAPI.getPrices();
@@ -30,7 +31,7 @@ export default function PricePreview() {
     };
 
     fetchPrices();
-  }, []);
+  });
   return (
     <section className="price-section">
       <h2 className="section-title">Treatments & Prices</h2>

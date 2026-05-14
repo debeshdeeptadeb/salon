@@ -43,7 +43,12 @@ api.interceptors.request.use(
             } catch {
                 /* ignore */
             }
-        } else if (!url.includes('/auth/') && !url.includes('/salons/public/')) {
+        } else if (
+            !url.includes('/auth/') &&
+            !url.includes('/salons/public/') &&
+            !url.includes('/salons/discover') &&
+            !url.includes('/salons/directory')
+        ) {
             const slug =
                 localStorage.getItem('publicSalonSlug') ||
                 import.meta.env.VITE_DEFAULT_SALON_SLUG ||
@@ -84,6 +89,8 @@ export const salonsAPI = {
     patch: (id, data) => api.patch(`/salons/${id}`, data),
     getPublic: (slug) => api.get(`/salons/public/${slug}`),
     discover: (params) => api.get('/salons/discover', { params }),
+    /** Active salons for public homepage picker (no tenant filter). */
+    directory: () => api.get('/salons/directory'),
 };
 
 export const salonStaffAPI = {

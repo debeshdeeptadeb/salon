@@ -1,17 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { galleryAPI, API_ORIGIN } from '../services/api';
 import './Gallery.css';
+import { useOnPublicSalonChange } from '../hooks/useOnPublicSalonChange';
 
 export default function Gallery() {
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [lightboxImage, setLightboxImage] = useState(null);
 
-    useEffect(() => {
-        fetchGalleryImages();
-    }, []);
-
-    const fetchGalleryImages = async () => {
+    const fetchGalleryImages = useCallback(async () => {
+        setLoading(true);
         try {
             const response = await galleryAPI.getAll();
             setImages(response.data.data);
@@ -20,7 +18,11 @@ export default function Gallery() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useOnPublicSalonChange(() => {
+        fetchGalleryImages();
+    });
 
     const openLightbox = (image) => {
         setLightboxImage(image);

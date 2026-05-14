@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { servicesAPI, API_ORIGIN } from "../services/api";
 import BookingModal from "../components/common/BookingModal";
 import "./Services.css";
+import { useOnPublicSalonChange } from "../hooks/useOnPublicSalonChange";
 
 export default function Services() {
   const [services, setServices] = useState([]);
@@ -11,11 +12,8 @@ export default function Services() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    setLoading(true);
     try {
       const [servicesRes, categoriesRes] = await Promise.all([
         servicesAPI.getAll(),
@@ -28,7 +26,11 @@ export default function Services() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useOnPublicSalonChange(() => {
+    fetchData();
+  });
 
   const filteredServices =
     activeCategory === "all"

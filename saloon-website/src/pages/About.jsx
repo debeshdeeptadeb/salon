@@ -1,16 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { contentAPI } from '../services/api';
 import './About.css';
+import { useOnPublicSalonChange } from '../hooks/useOnPublicSalonChange';
 
 export default function About() {
     const [content, setContent] = useState({});
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchContent();
-    }, []);
-
-    const fetchContent = async () => {
+    const fetchContent = useCallback(async () => {
+        setLoading(true);
         try {
             const response = await contentAPI.getAbout();
             setContent(response.data.data);
@@ -19,7 +17,11 @@ export default function About() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useOnPublicSalonChange(() => {
+        fetchContent();
+    });
 
     if (loading) {
         return (

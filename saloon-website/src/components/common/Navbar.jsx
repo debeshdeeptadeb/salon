@@ -93,7 +93,6 @@ export default function Navbar() {
 
   const handleHomeClick = () => {
     closeMobileMenu();
-    clearPinnedSalon();
   };
 
   const toggleMobileSearch = () => {

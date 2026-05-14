@@ -116,6 +116,22 @@ export const listSalons = async (req, res, next) => {
     }
 };
 
+// @desc    Public: list all active salons (name, location, maps link) for site picker
+// @route   GET /api/salons/directory
+export const listPublicSalonsDirectory = async (req, res, next) => {
+    try {
+        const result = await pool.query(
+            `SELECT id, name, slug, area, city, state, pincode, google_maps_url
+             FROM salons
+             WHERE is_active = true
+             ORDER BY name ASC`
+        );
+        res.status(200).json({ success: true, data: result.rows });
+    } catch (e) {
+        next(e);
+    }
+};
+
 // @desc    Public discovery: search salons by name/service/location
 // @route   GET /api/salons/discover
 export const discoverSalons = async (req, res, next) => {
