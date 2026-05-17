@@ -7,8 +7,11 @@ import {
 } from 'react-icons/hi2';
 import { contentAPI } from '../../services/api';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../context/AuthContext';
+import { Navigate } from 'react-router-dom';
 
 export default function ContentManagement() {
+    const { user, loading: authLoading } = useAuth();
     const [content, setContent] = useState({});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -20,8 +23,13 @@ export default function ContentManagement() {
     });
 
     useEffect(() => {
+        if (authLoading) return;
+        if (user?.role !== 'super_admin') {
+            setLoading(false);
+            return;
+        }
         fetchContent();
-    }, []);
+    }, [authLoading, user?.role]);
 
     const fetchContent = async () => {
         try {
@@ -68,6 +76,20 @@ export default function ContentManagement() {
         });
     };
 
+    if (authLoading) {
+        return (
+            <div className="admin-page">
+                <div className="loading-container">
+                    <div className="spinner"></div>
+                </div>
+            </div>
+        );
+    }
+
+    if (user?.role !== 'super_admin') {
+        return <Navigate to="/admin/dashboard" replace />;
+    }
+
     if (loading) {
         return (
             <div className="admin-page">
@@ -85,7 +107,10 @@ export default function ContentManagement() {
                     <HiOutlineDocumentText aria-hidden />
                     Content Management
                 </h1>
-                <p className="admin-ui-subtitle">Edit About page copy and structure.</p>
+                <p className="admin-ui-subtitle">
+                    Company and founder copy for the public About page. Only the platform owner can edit this;
+                    each salon still manages their own home page under Home Content.
+                </p>
             </div>
 
             <form onSubmit={handleSubmit}>

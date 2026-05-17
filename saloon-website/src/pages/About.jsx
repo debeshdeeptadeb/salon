@@ -1,7 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { contentAPI } from '../services/api';
 import './About.css';
-import { useOnPublicSalonChange } from '../hooks/useOnPublicSalonChange';
 
 export default function About() {
     const [content, setContent] = useState({});
@@ -19,9 +18,9 @@ export default function About() {
         }
     }, []);
 
-    useOnPublicSalonChange(() => {
+    useEffect(() => {
         fetchContent();
-    });
+    }, [fetchContent]);
 
     if (loading) {
         return (

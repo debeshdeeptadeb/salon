@@ -6,7 +6,6 @@ import { FaWandMagicSparkles } from "react-icons/fa6";
 import { HiOutlineScissors, HiOutlineSparkles, HiOutlineFaceSmile } from "react-icons/hi2";
 import "./Hero.css";
 import { homeContentAPI } from "../../services/api";
-import SalonPicker from "./SalonPicker";
 import { useOnPublicSalonChange } from "../../hooks/useOnPublicSalonChange";
 
 const trendingServices = [
@@ -55,8 +54,6 @@ export default function Hero() {
 
       <div className="container hero-container">
         <div className="hero-content">
-          <SalonPicker />
-
           {/* Luxury Badge */}
           <div className="hero-badge fade-in">
             <span className="badge-icon" aria-hidden="true">

@@ -47,7 +47,8 @@ api.interceptors.request.use(
             !url.includes('/auth/') &&
             !url.includes('/salons/public/') &&
             !url.includes('/salons/discover') &&
-            !url.includes('/salons/directory')
+            !url.includes('/salons/directory') &&
+            !url.includes('/content/about')
         ) {
             const slug =
                 localStorage.getItem('publicSalonSlug') ||

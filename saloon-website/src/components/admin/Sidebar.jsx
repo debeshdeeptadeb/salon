@@ -36,6 +36,7 @@ export default function Sidebar() {
             ? [
                   { path: '/admin/platform/salons', Icon: HiOutlineBuildingOffice2, label: 'Salons (tenants)' },
                   { path: '/admin/platform/staff', Icon: HiOutlineUsers, label: 'Salon staff' },
+                  { path: '/admin/content', Icon: HiOutlineDocumentText, label: 'About (company)' },
               ]
             : user?.role === 'salon_admin'
               ? [{ path: '/admin/platform/staff', Icon: HiOutlineUsers, label: 'Salon staff' }]
@@ -50,7 +51,6 @@ export default function Sidebar() {
         { path: '/admin/offers', Icon: HiOutlineGift, label: 'Offers' },
         { path: '/admin/qr-codes', Icon: HiOutlineQrCode, label: 'QR Codes' },
         { path: '/admin/bookings', Icon: HiOutlineCalendarDays, label: 'Bookings' },
-        { path: '/admin/content', Icon: HiOutlineDocumentText, label: 'Content' },
         { path: '/admin/settings', Icon: HiOutlinePaintBrush, label: 'Site Settings' },
         { path: '/admin/home-content', Icon: HiOutlineHome, label: 'Home Content' },
         { path: '/admin/enquiries', Icon: HiOutlineChatBubbleLeftRight, label: 'Enquiries' },

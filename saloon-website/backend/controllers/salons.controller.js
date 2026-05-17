@@ -158,6 +158,7 @@ export const discoverSalons = async (req, res, next) => {
                 s.pincode,
                 s.latitude,
                 s.longitude,
+                s.google_maps_url,
                 sv.id AS service_id,
                 sv.name AS service_name,
                 sv.price AS service_price,
@@ -186,7 +187,8 @@ export const discoverSalons = async (req, res, next) => {
                   $1 = '' OR
                   s.name ILIKE $5 OR
                   sv.name ILIKE $5 OR
-                  sc.name ILIKE $5
+                  sc.name ILIKE $5 OR
+                  CAST(sv.price AS TEXT) ILIKE $5
                 )
                 AND (
                   $2 = '' OR
@@ -197,7 +199,7 @@ export const discoverSalons = async (req, res, next) => {
                 )
             )
             SELECT
-              id, name, slug, area, city, state, pincode, latitude, longitude,
+              id, name, slug, area, city, state, pincode, latitude, longitude, google_maps_url,
               CASE
                 WHEN $3 IS NULL OR $4 IS NULL THEN NULL
                 ELSE MIN(distance_km)
@@ -214,7 +216,7 @@ export const discoverSalons = async (req, res, next) => {
                 '[]'::json
               ) AS matched_services
             FROM matched
-            GROUP BY id, name, slug, area, city, state, pincode, latitude, longitude
+            GROUP BY id, name, slug, area, city, state, pincode, latitude, longitude, google_maps_url
             ORDER BY
               CASE WHEN $3 IS NULL OR $4 IS NULL THEN 0 ELSE 1 END DESC,
               CASE WHEN $3 IS NULL OR $4 IS NULL THEN name END ASC,
