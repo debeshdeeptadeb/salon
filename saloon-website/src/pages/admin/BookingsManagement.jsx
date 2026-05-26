@@ -10,7 +10,7 @@ import {
     HiOutlineTrash,
     HiOutlineCheckBadge,
 } from "react-icons/hi2";
-import { bookingsAPI } from "../../services/api";
+import { bookingsAPI, API_ORIGIN } from "../../services/api";
 import "./BookingsManagement.css";
 
 export default function BookingsManagement() {
@@ -236,53 +236,87 @@ export default function BookingsManagement() {
                 ) : (
                     <div className="bookings-table-wrapper admin-table-scroll">
                         <table className="bookings-table admin-table-pro">
+                            <colgroup>
+                                <col className="col-id" />
+                                <col className="col-customer" />
+                                <col className="col-contact" />
+                                <col className="col-service" />
+                                <col className="col-datetime" />
+                                <col className="col-branch" />
+                                <col className="col-payment" />
+                                <col className="col-status" />
+                                <col className="col-actions" />
+                            </colgroup>
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Customer</th>
-                                    <th>Contact</th>
-                                    <th>Service</th>
-                                    <th>Date & Time</th>
-                                    <th>Branch</th>
-                                    <th>Payment</th>
-                                    <th>Booking status</th>
-                                    <th>Actions</th>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Customer</th>
+                                    <th scope="col">Contact</th>
+                                    <th scope="col">Service</th>
+                                    <th scope="col">Date &amp; Time</th>
+                                    <th scope="col">Branch</th>
+                                    <th scope="col">Payment</th>
+                                    <th scope="col">Booking status</th>
+                                    <th scope="col" className="th-actions">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {bookings.map((booking) => (
                                     <tr key={booking.id}>
-                                        <td className="booking-id">#{booking.id}</td>
-                                        <td className="customer-name">{booking.customer_name}</td>
-                                        <td className="customer-contact">
+                                        <td className="booking-id" data-label="ID">#{booking.id}</td>
+                                        <td className="customer-name" data-label="Customer">{booking.customer_name}</td>
+                                        <td className="customer-contact" data-label="Contact">
                                             <div>{booking.customer_phone}</div>
                                             {booking.customer_email && (
                                                 <div className="email">{booking.customer_email}</div>
                                             )}
                                         </td>
-                                        <td className="service-info">
+                                        <td className="service-info" data-label="Service">
                                             <div className="service-name">{booking.service_name}</div>
                                             <div className="service-price">₹{booking.service_price}</div>
                                         </td>
-                                        <td className="datetime">
+                                        <td className="datetime" data-label="Date & Time">
                                             <div className="date">{formatDate(booking.booking_date)}</div>
                                             <div className="time">{formatTime(booking.booking_time)}</div>
                                         </td>
-                                        <td className="branch">{booking.branch}</td>
-                                        <td>
-                                            <span className={`payment-badge ${booking.payment_status === 'paid' ? 'payment-paid' : 'payment-pending'}`}>
+                                        <td className="branch" data-label="Branch">{booking.branch}</td>
+                                        <td className="payment-cell" data-label="Payment">
+                                            <span className={`payment-badge ${
+                                                booking.payment_status === 'paid'
+                                                    ? 'payment-paid'
+                                                    : booking.payment_status === 'pay_at_salon'
+                                                        ? 'payment-at-salon'
+                                                        : 'payment-pending'
+                                            }`}>
                                                 {booking.payment_status === 'paid' ? (
                                                     <>
                                                         <HiOutlineBanknotes size={14} aria-hidden /> Paid
                                                     </>
+                                                ) : booking.payment_status === 'pay_at_salon' ? (
+                                                    <>Pay at salon</>
                                                 ) : (
                                                     <>
                                                         <HiOutlineClock size={14} aria-hidden /> Pending
                                                     </>
                                                 )}
                                             </span>
+                                            {booking.payment_reference && (
+                                                <span className="payment-utr" title="Customer UPI reference">
+                                                    UTR: {booking.payment_reference}
+                                                </span>
+                                            )}
+                                            {booking.payment_screenshot_url && (
+                                                <a
+                                                    className="payment-screenshot-link"
+                                                    href={`${API_ORIGIN}${booking.payment_screenshot_url}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    View screenshot
+                                                </a>
+                                            )}
                                         </td>
-                                        <td>
+                                        <td className="status-cell" data-label="Booking status">
                                             <select
                                                 className={`status-select ${getStatusBadgeClass(booking.status)}`}
                                                 value={booking.status}
@@ -294,7 +328,7 @@ export default function BookingsManagement() {
                                                 <option value="cancelled">Cancelled</option>
                                             </select>
                                         </td>
-                                        <td className="actions">
+                                        <td className="actions" data-label="Actions">
                                             {booking.payment_status !== 'paid' && (
                                                 <button
                                                     type="button"

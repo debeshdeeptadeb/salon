@@ -68,11 +68,15 @@
 
 /* Tables: consistent alignment */
 .admin-table-pro,
-.bookings-table,
 .admin-table {
     width: 100%;
     border-collapse: collapse;
     table-layout: auto;
+}
+
+/* Bookings table uses fixed columns — see BookingsManagement.css */
+.bookings-management .bookings-table {
+    table-layout: fixed;
 }
 
 .admin-table-pro th,

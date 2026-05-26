@@ -1,23 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { qrAPI, bookingsAPI, settingsAPI, API_ORIGIN } from '../services/api';
+import PaymentStep from '../components/common/PaymentStep';
+import { generateTimeSlots } from '../utils/bookingSlots';
 import { toast } from 'react-toastify';
 import './SalonQR.css';
 
-// Time slots 8 AM – 9 PM, 30-min intervals
-function generateTimeSlots() {
-    const slots = [];
-    for (let hour = 8; hour <= 21; hour++) {
-        for (let min = 0; min < 60; min += 30) {
-            if (hour === 21 && min > 0) break;
-            const val = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
-            const h12 = hour % 12 || 12;
-            const ampm = hour >= 12 ? 'PM' : 'AM';
-            slots.push({ value: val, label: `${h12}:${String(min).padStart(2, '0')} ${ampm}` });
-        }
-    }
-    return slots;
-}
 const TIME_SLOTS = generateTimeSlots();
 const TODAY = new Date().toISOString().split('T')[0];
 
@@ -41,6 +29,11 @@ export default function SalonQR() {
     });
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
+    const [bookingId, setBookingId] = useState(null);
+    const [submitError, setSubmitError] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('upi_online');
+    const [bookedTimes, setBookedTimes] = useState([]);
+    const [loadingSlots, setLoadingSlots] = useState(false);
 
     useEffect(() => { fetchData(); }, [qrCodeId]);
 
@@ -63,9 +56,36 @@ export default function SalonQR() {
         }
     };
 
+    const qrBranch = data?.qrCode?.label || 'Walk-in';
+
+    useEffect(() => {
+        if (!formData.booking_date || !selectedService) {
+            setBookedTimes([]);
+            return;
+        }
+        let cancelled = false;
+        setLoadingSlots(true);
+        bookingsAPI
+            .getAvailability({ date: formData.booking_date, branch: qrBranch })
+            .then((res) => {
+                if (!cancelled) setBookedTimes(res.data.data?.bookedTimes || []);
+            })
+            .catch(() => {
+                if (!cancelled) setBookedTimes([]);
+            })
+            .finally(() => {
+                if (!cancelled) setLoadingSlots(false);
+            });
+        return () => { cancelled = true; };
+    }, [formData.booking_date, selectedService, qrBranch]);
+
     const openBooking = (service) => {
         setSelectedService(service);
         setStep(1);
+        setPaymentMethod('upi_online');
+        setBookingId(null);
+        setSubmitError('');
+        setBookedTimes([]);
         setFormData({ customer_name: '', customer_phone: '', booking_date: '', booking_time: '' });
         setErrors({});
     };
@@ -84,27 +104,51 @@ export default function SalonQR() {
             newErr.customer_phone = 'Enter a valid 10-digit number';
         if (!formData.booking_date) newErr.booking_date = 'Date is required';
         if (!formData.booking_time) newErr.booking_time = 'Time slot is required';
+        if (bookedTimes.includes(formData.booking_time))
+            newErr.booking_time = 'This slot is no longer available';
         setErrors(newErr);
         return Object.keys(newErr).length === 0;
     };
 
-    const handleNext = () => {
-        if (validate()) setStep(2);
-    };
-
-    const handleIvePaid = async () => {
+    const handleNext = async () => {
+        if (!validate()) return;
         setSubmitting(true);
+        setSubmitError('');
         try {
-            await bookingsAPI.create({
+            const res = await bookingsAPI.create({
                 ...formData,
                 service_id: selectedService.id,
-                branch: data?.qrCode?.label || 'Walk-in',
+                branch: qrBranch,
                 qr_source_id: qrCodeId,
-                payment_status: 'pending',
+                payment_method: paymentMethod,
+                payment_status: paymentMethod === 'pay_at_salon' ? 'pay_at_salon' : 'pending',
             });
-            setStep(3);
+            setBookingId(res.data.data.id);
+            if (paymentMethod === 'pay_at_salon') {
+                setStep(3);
+            } else {
+                setStep(2);
+            }
         } catch (err) {
             toast.error(err.response?.data?.error || 'Booking failed. Please try again.');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleConfirmPaid = async ({ paymentReference, screenshot }) => {
+        if (!bookingId) return;
+        setSubmitting(true);
+        setSubmitError('');
+        try {
+            const payload = new FormData();
+            payload.append('customer_phone', formData.customer_phone.replace(/\D/g, ''));
+            if (paymentReference) payload.append('payment_reference', paymentReference);
+            if (screenshot) payload.append('payment_screenshot', screenshot);
+            await bookingsAPI.confirmPayment(bookingId, payload);
+            setStep(3);
+        } catch (err) {
+            setSubmitError(err.response?.data?.error || 'Could not confirm payment.');
         } finally {
             setSubmitting(false);
         }
@@ -256,6 +300,20 @@ export default function SalonQR() {
                                 <h2>Your Details</h2>
 
                                 <div className="sqr-form-group">
+                                    <label>Payment option</label>
+                                    <div className="sqr-pay-methods">
+                                        <label className={`sqr-pay-opt${paymentMethod === 'upi_online' ? ' active' : ''}`}>
+                                            <input type="radio" checked={paymentMethod === 'upi_online'} onChange={() => setPaymentMethod('upi_online')} />
+                                            Pay online (UPI)
+                                        </label>
+                                        <label className={`sqr-pay-opt${paymentMethod === 'pay_at_salon' ? ' active' : ''}`}>
+                                            <input type="radio" checked={paymentMethod === 'pay_at_salon'} onChange={() => setPaymentMethod('pay_at_salon')} />
+                                            Pay at salon
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className="sqr-form-group">
                                     <label>Full Name *</label>
                                     <input
                                         type="text"
@@ -297,74 +355,41 @@ export default function SalonQR() {
                                             value={formData.booking_time}
                                             onChange={e => setFormData(p => ({ ...p, booking_time: e.target.value }))}
                                             className={errors.booking_time ? 'error' : ''}
+                                            disabled={!formData.booking_date}
                                         >
-                                            <option value="">Select time</option>
+                                            <option value="">
+                                                {!formData.booking_date ? 'Select date first' : loadingSlots ? 'Loading…' : 'Select time'}
+                                            </option>
                                             {TIME_SLOTS.map(s => (
-                                                <option key={s.value} value={s.value}>{s.label}</option>
+                                                <option key={s.value} value={s.value} disabled={bookedTimes.includes(s.value)}>
+                                                    {s.label}{bookedTimes.includes(s.value) ? ' — Booked' : ''}
+                                                </option>
                                             ))}
                                         </select>
                                         {errors.booking_time && <span className="sqr-err">{errors.booking_time}</span>}
                                     </div>
                                 </div>
 
-                                <button className="sqr-btn-primary sqr-btn-full" onClick={handleNext}>
-                                    Next — Pay ₹{selectedService.price} →
+                                <button className="sqr-btn-primary sqr-btn-full" onClick={handleNext} disabled={submitting}>
+                                    {submitting
+                                        ? 'Reserving…'
+                                        : paymentMethod === 'pay_at_salon'
+                                            ? 'Confirm booking'
+                                            : `Continue to pay ₹${selectedService.price}`}
                                 </button>
                             </div>
                         )}
 
-                        {/* ── Step 2: UPI Payment ── */}
                         {step === 2 && (
-                            <div className="sqr-payment">
-                                <h2>Scan &amp; Pay</h2>
-                                <p className="sqr-pay-sub">
-                                    Scan the QR below using any UPI app (GPay, PhonePe, Paytm, etc.)
-                                </p>
-
-                                <div className="sqr-upi-amount">
-                                    Amount: <strong>₹{selectedService.price}</strong>
-                                </div>
-
-                                {upiSettings?.upi_qr_image_url ? (
-                                    <div className="sqr-upi-qr-wrap">
-                                        <img
-                                            src={`${API_ORIGIN}${upiSettings.upi_qr_image_url}`}
-                                            alt="UPI Payment QR"
-                                            className="sqr-upi-qr"
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className="sqr-upi-placeholder">
-                                        <div className="sqr-upi-icon">💳</div>
-                                        <p>UPI QR not set up yet.<br />Please contact the salon directly.</p>
-                                    </div>
-                                )}
-
-                                {upiSettings?.upi_id && (
-                                    <div className="sqr-upi-id">
-                                        <span>UPI ID:</span>
-                                        <strong>{upiSettings.upi_id}</strong>
-                                    </div>
-                                )}
-
-                                <div className="sqr-pay-steps">
-                                    <div className="sqr-pay-step">1. Open GPay / PhonePe / Paytm</div>
-                                    <div className="sqr-pay-step">2. Scan the QR code above</div>
-                                    <div className="sqr-pay-step">3. Pay ₹{selectedService.price}</div>
-                                    <div className="sqr-pay-step">4. Tap "I've Paid" below</div>
-                                </div>
-
-                                <button
-                                    className="sqr-btn-primary sqr-btn-full sqr-btn-paid"
-                                    onClick={handleIvePaid}
-                                    disabled={submitting}
-                                >
-                                    {submitting ? 'Confirming...' : "✅ I've Paid — Confirm Booking"}
-                                </button>
-                                <button className="sqr-btn-ghost sqr-btn-back" onClick={() => setStep(1)} disabled={submitting}>
-                                    ← Back
-                                </button>
-                            </div>
+                            <PaymentStep
+                                service={selectedService}
+                                bookingId={bookingId}
+                                upiSettings={upiSettings}
+                                onConfirm={handleConfirmPaid}
+                                onBack={() => setStep(1)}
+                                loading={submitting}
+                                error={submitError}
+                            />
                         )}
 
                         {/* ── Step 3: Success ── */}
@@ -377,10 +402,16 @@ export default function SalonQR() {
                                     <div><span>Service</span><strong>{selectedService.name}</strong></div>
                                     <div><span>Date</span><strong>{formData.booking_date}</strong></div>
                                     <div><span>Time</span><strong>{formData.booking_time}</strong></div>
-                                    <div><span>Payment</span><strong className="sqr-pending-badge">Pending Verification</strong></div>
+                                    <div><span>Payment</span>
+                                        <strong className={paymentMethod === 'pay_at_salon' ? 'sqr-salon-pay-badge' : 'sqr-pending-badge'}>
+                                            {paymentMethod === 'pay_at_salon' ? 'Pay at salon' : 'Pending verification'}
+                                        </strong>
+                                    </div>
                                 </div>
                                 <p className="sqr-success-note">
-                                    The salon will verify your payment and confirm your appointment shortly. 📱
+                                    {paymentMethod === 'pay_at_salon'
+                                        ? `Pay ₹${selectedService.price} when you arrive. Confirmation sent to your phone.`
+                                        : 'The salon will verify your payment and confirm your appointment shortly.'}
                                 </p>
                                 <button className="sqr-btn-primary" onClick={closeBooking}>
                                     Book Another Service

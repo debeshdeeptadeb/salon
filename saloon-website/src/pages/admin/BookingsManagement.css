@@ -210,39 +210,64 @@
     background: transparent;
 }
 
-.bookings-table {
+/* Fixed layout keeps header columns aligned with body cells */
+.bookings-management .bookings-table {
     width: 100%;
+    min-width: 1180px;
+    table-layout: fixed;
     border-collapse: collapse;
+    border-spacing: 0;
 }
 
-.bookings-table thead {
+.bookings-management .bookings-table col.col-id { width: 56px; }
+.bookings-management .bookings-table col.col-customer { width: 11%; }
+.bookings-management .bookings-table col.col-contact { width: 13%; }
+.bookings-management .bookings-table col.col-service { width: 14%; }
+.bookings-management .bookings-table col.col-datetime { width: 15%; }
+.bookings-management .bookings-table col.col-branch { width: 9%; }
+.bookings-management .bookings-table col.col-payment { width: 14%; }
+.bookings-management .bookings-table col.col-status { width: 12%; }
+.bookings-management .bookings-table col.col-actions { width: 120px; }
+
+.bookings-management .bookings-table thead {
     background: #f8fafc;
     border-bottom: 2px solid #e2e8f0;
 }
 
-.bookings-table th {
-    padding: 16px;
+.bookings-management .bookings-table th {
+    padding: 14px 12px;
     text-align: left;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     color: #475569;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    vertical-align: middle;
+    box-sizing: border-box;
 }
 
-.bookings-table tbody tr {
+.bookings-management .bookings-table th.th-actions {
+    text-align: right;
+}
+
+.bookings-management .bookings-table tbody tr {
     border-bottom: 1px solid #f1f5f9;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease;
 }
 
-.bookings-table tbody tr:hover {
+.bookings-management .bookings-table tbody tr:hover {
     background: #f8fafc;
 }
 
-.bookings-table td {
-    padding: 16px;
+.bookings-management .bookings-table td {
+    padding: 14px 12px;
     color: #334155;
     font-size: 14px;
+    vertical-align: middle;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .booking-id {
@@ -261,10 +286,19 @@
     margin-top: 4px;
 }
 
+.bookings-management .payment-cell {
+    vertical-align: top;
+}
+
+.bookings-management .payment-cell .payment-badge {
+    margin-bottom: 2px;
+}
+
 .service-info {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    min-width: 0;
 }
 
 .service-name {
@@ -365,12 +399,55 @@
     border: 1px solid #fef08a;
 }
 
+.payment-at-salon {
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
+.payment-utr {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--text-muted, #64748b);
+    font-family: ui-monospace, monospace;
+}
+
+.payment-screenshot-link {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.payment-screenshot-link:hover {
+    text-decoration: underline;
+}
+
 /* ── Actions ──────────────────────────────────── */
-.actions {
-    display: flex;
+.bookings-management .bookings-table td.actions {
+    text-align: right;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.bookings-management .actions {
+    display: inline-flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 8px;
-    justify-content: flex-start;
+    width: 100%;
+}
+
+.bookings-management .status-cell {
+    white-space: nowrap;
+}
+
+.bookings-management .status-select {
+    max-width: 100%;
+    width: 100%;
+    min-width: 7.5rem;
 }
 
 .btn-mark-paid {
@@ -417,13 +494,14 @@
 
 /* ── Responsive Design ────────────────────────── */
 @media (max-width: 1200px) {
-    .bookings-table {
+    .bookings-management .bookings-table {
         font-size: 13px;
+        min-width: 1100px;
     }
 
-    .bookings-table th,
-    .bookings-table td {
-        padding: 12px;
+    .bookings-management .bookings-table th,
+    .bookings-management .bookings-table td {
+        padding: 12px 10px;
     }
 }
 
@@ -463,18 +541,18 @@
         overflow-x: auto;
     }
 
-    .bookings-table {
-        min-width: 920px;
+    .bookings-management .bookings-table {
+        min-width: 1000px;
     }
 
-    .bookings-table th,
-    .bookings-table td {
-        padding: 10px 12px;
+    .bookings-management .bookings-table th,
+    .bookings-management .bookings-table td {
+        padding: 10px 8px;
         font-size: 13px;
     }
 
-    .actions {
-        flex-wrap: wrap;
+    .bookings-management .actions {
+        flex-wrap: nowrap;
     }
 }
 
@@ -491,11 +569,11 @@
         font-size: 22px;
     }
 
-    .bookings-table {
-        min-width: 880px;
+    .bookings-management .bookings-table {
+        min-width: 960px;
     }
 
-    .status-select {
-        max-width: 100%;
+    .bookings-management .status-select {
+        min-width: 6.5rem;
     }
 }

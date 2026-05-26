@@ -221,6 +221,15 @@ export const enquiriesAPI = {
 // =============================================
 export const bookingsAPI = {
     create: (data) => api.post('/bookings', data),
+    getAvailability: (params) => api.get('/bookings/availability', { params }),
+    confirmPayment: (id, data) => {
+        if (data instanceof FormData) {
+            return api.patch(`/bookings/${id}/confirm-payment`, data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+        }
+        return api.patch(`/bookings/${id}/confirm-payment`, data);
+    },
     getAll: (filters) => api.get('/bookings', { params: filters }),
     getOne: (id) => api.get(`/bookings/${id}`),
     updateStatus: (id, status) => api.put(`/bookings/${id}/status`, { status }),

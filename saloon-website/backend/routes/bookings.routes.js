@@ -6,14 +6,24 @@ import {
     updateBookingStatus,
     deleteBooking,
     getBookingStats,
-    markPaymentPaid
+    markPaymentPaid,
+    confirmPayment,
+    getAvailability,
 } from '../controllers/bookings.controller.js';
 import { protect } from '../middleware/auth.js';
 import { publicSalonFromQuery, requireSalonContext } from '../middleware/salonContext.js';
+import { uploadPaymentScreenshot } from '../middleware/uploadPayment.js';
 
 const router = express.Router();
 
+router.get('/availability', publicSalonFromQuery, getAvailability);
 router.post('/', publicSalonFromQuery, createBooking);
+router.patch(
+    '/:id/confirm-payment',
+    publicSalonFromQuery,
+    uploadPaymentScreenshot.single('payment_screenshot'),
+    confirmPayment
+);
 
 router.get('/stats', protect, requireSalonContext, getBookingStats);
 router.get('/', protect, requireSalonContext, getAllBookings);

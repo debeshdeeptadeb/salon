@@ -726,6 +726,39 @@
     color: var(--sqr-muted);
 }
 
+.sqr-pay-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sqr-pay-opt {
+    display: block;
+    padding: 12px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.sqr-pay-opt input {
+    margin-right: 8px;
+}
+
+.sqr-pay-opt.active {
+    border-color: #d4af37;
+    background: #fffbeb;
+}
+
+.sqr-salon-pay-badge {
+    background: #dbeafe;
+    color: #1d4ed8;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
 .sqr-pending-badge {
     background: #fef3c7;
     color: #d97706;

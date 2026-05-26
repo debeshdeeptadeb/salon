@@ -1,10 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
-import { settingsAPI, bookingsAPI, API_ORIGIN } from "../../services/api";
+import { settingsAPI, bookingsAPI } from "../../services/api";
+import PaymentStep from "./PaymentStep";
+import { generateTimeSlots } from "../../utils/bookingSlots";
 import "./BookingModal.css";
 
 export default function BookingModal({ isOpen, onClose, service }) {
-    const [step, setStep] = useState(1); // 1=details, 2=payment, 3=success
+    const [step, setStep] = useState(1);
+    const [paymentMethod, setPaymentMethod] = useState("upi_online");
     const [formData, setFormData] = useState({
         customer_name: "",
         customer_phone: "",
@@ -18,16 +21,23 @@ export default function BookingModal({ isOpen, onClose, service }) {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [upiSettings, setUpiSettings] = useState(null);
+    const [bookingId, setBookingId] = useState(null);
+    const [whatsappURLs, setWhatsappURLs] = useState(null);
+    const [bookedTimes, setBookedTimes] = useState([]);
+    const [loadingSlots, setLoadingSlots] = useState(false);
 
-    // Branch options
     const branches = ["Cuttack", "Bhubaneswar", "Baripada"];
+    const allTimeSlots = useMemo(() => generateTimeSlots(), []);
 
-    // When opening for a service: reset form, step, and load UPI QR from Site Settings (admin upload)
     useEffect(() => {
         if (!isOpen || !service?.id) return;
         setStep(1);
+        setPaymentMethod("upi_online");
         setErrors({});
         setLoading(false);
+        setBookingId(null);
+        setWhatsappURLs(null);
+        setBookedTimes([]);
         setFormData({
             customer_name: "",
             customer_phone: "",
@@ -43,31 +53,44 @@ export default function BookingModal({ isOpen, onClose, service }) {
             .catch(() => setUpiSettings(null));
     }, [isOpen, service?.id]);
 
-    // Format time for display
+    useEffect(() => {
+        if (!formData.booking_date || !formData.branch) {
+            setBookedTimes([]);
+            return;
+        }
+
+        let cancelled = false;
+        setLoadingSlots(true);
+        bookingsAPI
+            .getAvailability({ date: formData.booking_date, branch: formData.branch })
+            .then((res) => {
+                if (!cancelled) setBookedTimes(res.data.data?.bookedTimes || []);
+            })
+            .catch(() => {
+                if (!cancelled) setBookedTimes([]);
+            })
+            .finally(() => {
+                if (!cancelled) setLoadingSlots(false);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [formData.booking_date, formData.branch]);
+
+    useEffect(() => {
+        if (formData.booking_time && bookedTimes.includes(formData.booking_time)) {
+            setFormData((prev) => ({ ...prev, booking_time: "" }));
+        }
+    }, [bookedTimes, formData.booking_time]);
+
     const formatTime = (time) => {
         const [hours, minutes] = time.split(":");
-        const hour = parseInt(hours);
+        const hour = parseInt(hours, 10);
         const ampm = hour >= 12 ? "PM" : "AM";
         const displayHour = hour % 12 || 12;
         return `${displayHour}:${minutes} ${ampm}`;
     };
-
-    // Time slots from 8 AM to 9 PM (30-minute intervals)
-    const generateTimeSlots = () => {
-        const slots = [];
-        for (let hour = 8; hour <= 21; hour++) {
-            for (let minute = 0; minute < 60; minute += 30) {
-                if (hour === 21 && minute > 0) break;
-                const time = `${hour.toString().padStart(2, "0")}:${minute
-                    .toString()
-                    .padStart(2, "0")}`;
-                slots.push({ value: time, label: formatTime(time) });
-            }
-        }
-        return slots;
-    };
-
-    const timeSlots = generateTimeSlots();
 
     const getMinDate = () => new Date().toISOString().split("T")[0];
 
@@ -90,32 +113,68 @@ export default function BookingModal({ isOpen, onClose, service }) {
         if (!formData.booking_date) newErrors.booking_date = "Date is required";
         if (!formData.booking_time) newErrors.booking_time = "Time is required";
         if (!formData.branch) newErrors.branch = "Branch is required";
+        if (bookedTimes.includes(formData.booking_time))
+            newErrors.booking_time = "This slot was just booked. Please pick another time.";
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    // Step 1 → Step 2: just validate and show payment QR
-    const handleNext = (e) => {
-        e.preventDefault();
-        if (validateForm()) setStep(2);
+    const finishSuccess = (res) => {
+        const booking = res.data.data;
+        setBookingId(booking.id);
+        if (res.data.whatsappURLs) setWhatsappURLs(res.data.whatsappURLs);
+        setStep(3);
     };
 
-    // Step 2 → Step 3: save booking, show success
-    const handleConfirmPaid = async () => {
+    const handleNext = async (e) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+
         setLoading(true);
         setErrors((prev) => ({ ...prev, submit: "" }));
         try {
-            await bookingsAPI.create({
+            const res = await bookingsAPI.create({
                 ...formData,
                 service_id: service.id,
-                payment_status: "pending",
+                payment_method: paymentMethod,
+                payment_status: paymentMethod === "pay_at_salon" ? "pay_at_salon" : "pending",
             });
+
+            if (paymentMethod === "pay_at_salon") {
+                finishSuccess(res);
+            } else {
+                setBookingId(res.data.data.id);
+                if (res.data.whatsappURLs) setWhatsappURLs(res.data.whatsappURLs);
+                setStep(2);
+            }
+        } catch (err) {
+            const msg =
+                err.response?.data?.error ||
+                err.message ||
+                "Failed to reserve your slot. Please try again.";
+            setErrors({ submit: msg });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleConfirmPaid = async ({ paymentReference, screenshot }) => {
+        if (!bookingId) return;
+        setLoading(true);
+        setErrors((prev) => ({ ...prev, submit: "" }));
+        try {
+            const payload = new FormData();
+            payload.append("customer_phone", formData.customer_phone.replace(/\D/g, ""));
+            if (paymentReference) payload.append("payment_reference", paymentReference);
+            if (screenshot) payload.append("payment_screenshot", screenshot);
+
+            await bookingsAPI.confirmPayment(bookingId, payload);
             setStep(3);
         } catch (err) {
             const msg =
                 err.response?.data?.error ||
                 err.message ||
-                "Failed to save booking. Please try again.";
+                "Could not confirm payment. Please try again.";
             setErrors({ submit: msg });
         } finally {
             setLoading(false);
@@ -128,6 +187,9 @@ export default function BookingModal({ isOpen, onClose, service }) {
             booking_date: "", booking_time: "", branch: "", notes: "",
         });
         setErrors({});
+        setBookingId(null);
+        setWhatsappURLs(null);
+        setPaymentMethod("upi_online");
         setStep(1);
     };
 
@@ -161,46 +223,108 @@ export default function BookingModal({ isOpen, onClose, service }) {
 
     if (!isOpen || !service) return null;
 
+    const isPayAtSalon = paymentMethod === "pay_at_salon";
+    const stepLabels = isPayAtSalon ? ["Details", "Done"] : ["Details", "Pay", "Done"];
+    const displayStep = isPayAtSalon
+        ? step === 1 ? 1 : 2
+        : step;
+
+    const stepTitles = {
+        1: "Book Your Appointment",
+        2: "Complete Payment",
+        3: null,
+    };
+
+    const successPaymentLabel =
+        paymentMethod === "pay_at_salon"
+            ? "Pay at salon"
+            : "Awaiting verification";
+
     return (
         <div className="booking-modal-overlay" onClick={handleClose}>
             <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close" onClick={handleClose} disabled={loading}>
+                <div className="bm-modal-accent" aria-hidden />
+                <button className="modal-close" onClick={handleClose} disabled={loading} aria-label="Close">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <line x1="18" y1="6" x2="6" y2="18" />
                         <line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
                 </button>
 
-                {/* Step indicator */}
-                <div className="bm-steps">
-                    {["Details", "Pay", "Done"].map((label, i) => (
-                        <div key={label} className={`bm-step${step === i + 1 ? " active" : step > i + 1 ? " done" : ""}`}>
-                            <div className="bm-step-num">{step > i + 1 ? "✓" : i + 1}</div>
-                            <span>{label}</span>
-                        </div>
-                    ))}
+                <div className={`bm-steps${isPayAtSalon ? " bm-steps--two" : ""}`}>
+                    {stepLabels.map((label, i) => {
+                        const stepNum = i + 1;
+                        const isActive = displayStep === stepNum;
+                        const isDone = displayStep > stepNum;
+                        return (
+                            <div key={label} className={`bm-step${isActive ? " active" : isDone ? " done" : ""}`}>
+                                <div className="bm-step-num">{isDone ? "✓" : stepNum}</div>
+                                <span>{label}</span>
+                            </div>
+                        );
+                    })}
                 </div>
 
                 <div className="modal-header">
                     {step < 3 && (
                         <>
-                            <h2>{step === 1 ? "Book Your Appointment" : "Scan & Pay"}</h2>
-                            <div className="service-info">
-                                <h3>{service.name}</h3>
-                                <div className="service-meta">
-                                    <span className="price">₹{service.price}</span>
-                                    <span className="duration">{service.duration} mins</span>
+                            <p className="bm-eyebrow">Minjal Salon · Secure booking</p>
+                            <h2>{stepTitles[step]}</h2>
+                            <div className="bm-service-card">
+                                <div className="bm-service-card-text">
+                                    <h3>{service.name}</h3>
+                                    <span className="bm-service-duration">{service.duration} min session</span>
                                 </div>
+                                <div className="bm-service-price">₹{service.price}</div>
                             </div>
                         </>
                     )}
                 </div>
 
-                {/* ── Step 1: Customer Details ── */}
                 {step === 1 && (
                     <form className="booking-form" onSubmit={handleNext}>
                         <div className="form-group">
-                            <label htmlFor="customer_name">Full Name <span className="required">*</span></label>
+                            <label className="bm-section-label">How would you like to pay?</label>
+                            <div className="bm-payment-method-options">
+                                <label className={`bm-pay-option${paymentMethod === "upi_online" ? " selected" : ""}`}>
+                                    <input
+                                        type="radio"
+                                        name="payment_method"
+                                        value="upi_online"
+                                        checked={paymentMethod === "upi_online"}
+                                        onChange={() => setPaymentMethod("upi_online")}
+                                    />
+                                    <span className="bm-pay-option-icon" aria-hidden>
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                                    </span>
+                                    <span className="bm-pay-option-body">
+                                        <span className="bm-pay-option-title">Pay online (UPI)</span>
+                                        <span className="bm-pay-option-desc">Instant QR · secure verification</span>
+                                    </span>
+                                </label>
+                                <label className={`bm-pay-option${paymentMethod === "pay_at_salon" ? " selected" : ""}`}>
+                                    <input
+                                        type="radio"
+                                        name="payment_method"
+                                        value="pay_at_salon"
+                                        checked={paymentMethod === "pay_at_salon"}
+                                        onChange={() => setPaymentMethod("pay_at_salon")}
+                                    />
+                                    <span className="bm-pay-option-icon" aria-hidden>
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                    </span>
+                                    <span className="bm-pay-option-body">
+                                        <span className="bm-pay-option-title">Pay at salon</span>
+                                        <span className="bm-pay-option-desc">Reserve now · pay on arrival</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <p className="bm-section-label bm-section-label--spaced">Your details</p>
+
+                        <div className="form-group">
+                            <label htmlFor="customer_name">Full name <span className="required">*</span></label>
                             <input type="text" id="customer_name" name="customer_name"
                                 value={formData.customer_name} onChange={handleChange}
                                 className={errors.customer_name ? "error" : ""}
@@ -222,7 +346,7 @@ export default function BookingModal({ isOpen, onClose, service }) {
                             <input type="email" id="customer_email" name="customer_email"
                                 value={formData.customer_email} onChange={handleChange}
                                 className={errors.customer_email ? "error" : ""}
-                                placeholder="your.email@example.com (optional)" />
+                                placeholder="For booking confirmation (recommended)" />
                             {errors.customer_email && <span className="error-message">{errors.customer_email}</span>}
                         </div>
 
@@ -235,108 +359,105 @@ export default function BookingModal({ isOpen, onClose, service }) {
                                 {errors.booking_date && <span className="error-message">{errors.booking_date}</span>}
                             </div>
                             <div className="form-group">
-                                <label htmlFor="booking_time">Time <span className="required">*</span></label>
-                                <select id="booking_time" name="booking_time"
-                                    value={formData.booking_time} onChange={handleChange}
-                                    className={errors.booking_time ? "error" : ""}>
-                                    <option value="">Select time</option>
-                                    {timeSlots.map((slot) => (
-                                        <option key={slot.value} value={slot.value}>{slot.label}</option>
-                                    ))}
+                                <label htmlFor="branch">Branch <span className="required">*</span></label>
+                                <select id="branch" name="branch"
+                                    value={formData.branch} onChange={handleChange}
+                                    className={errors.branch ? "error" : ""}>
+                                    <option value="">Select branch</option>
+                                    {branches.map((b) => <option key={b} value={b}>{b}</option>)}
                                 </select>
-                                {errors.booking_time && <span className="error-message">{errors.booking_time}</span>}
+                                {errors.branch && <span className="error-message">{errors.branch}</span>}
                             </div>
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="branch">Branch <span className="required">*</span></label>
-                            <select id="branch" name="branch"
-                                value={formData.branch} onChange={handleChange}
-                                className={errors.branch ? "error" : ""}>
-                                <option value="">Select branch</option>
-                                {branches.map((b) => <option key={b} value={b}>{b}</option>)}
+                            <label htmlFor="booking_time">Time <span className="required">*</span></label>
+                            <select id="booking_time" name="booking_time"
+                                value={formData.booking_time} onChange={handleChange}
+                                className={errors.booking_time ? "error" : ""}
+                                disabled={!formData.booking_date || !formData.branch}>
+                                <option value="">
+                                    {!formData.booking_date || !formData.branch
+                                        ? "Select date and branch first"
+                                        : loadingSlots
+                                            ? "Loading slots…"
+                                            : "Select time"}
+                                </option>
+                                {allTimeSlots.map((slot) => {
+                                    const taken = bookedTimes.includes(slot.value);
+                                    return (
+                                        <option key={slot.value} value={slot.value} disabled={taken}>
+                                            {slot.label}{taken ? " — Booked" : ""}
+                                        </option>
+                                    );
+                                })}
                             </select>
-                            {errors.branch && <span className="error-message">{errors.branch}</span>}
+                            {errors.booking_time && <span className="error-message">{errors.booking_time}</span>}
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="notes">Bio / Additional Notes</label>
+                            <label htmlFor="notes">Additional Notes</label>
                             <textarea id="notes" name="notes" value={formData.notes} onChange={handleChange}
-                                placeholder="Add bio details, preferences, allergies, or special request (optional)" rows="3" />
-                        </div>
-
-                        <button type="submit" className="btn-submit">
-                            Next — Pay ₹{service.price} →
-                        </button>
-                    </form>
-                )}
-
-                {/* ── Step 2: UPI Payment ── */}
-                {step === 2 && (
-                    <div className="bm-payment">
-                        <p className="bm-pay-sub">
-                            Scan the QR below using any UPI app (GPay, PhonePe, Paytm, etc.)
-                        </p>
-                        <div className="bm-upi-amount">
-                            Amount: <strong>₹{service.price}</strong>
-                        </div>
-
-                        {upiSettings?.upi_qr_image_url ? (
-                            <div className="bm-qr-wrap">
-                                <img
-                                    src={`${API_ORIGIN}${upiSettings.upi_qr_image_url}`}
-                                    alt="UPI Payment QR"
-                                    className="bm-qr-img"
-                                />
-                            </div>
-                        ) : (
-                            <div className="bm-qr-placeholder">
-                                <div className="bm-qr-icon">💳</div>
-                                <p>UPI QR not set up yet.<br />Please contact the salon directly.</p>
-                            </div>
-                        )}
-
-                        {upiSettings?.upi_id && (
-                            <div className="bm-upi-id">
-                                <span>UPI ID:</span> <strong>{upiSettings.upi_id}</strong>
-                            </div>
-                        )}
-
-                        <div className="bm-pay-steps">
-                            <div className="bm-pay-step">1. Open GPay / PhonePe / Paytm</div>
-                            <div className="bm-pay-step">2. Scan the QR code above</div>
-                            <div className="bm-pay-step">3. Pay ₹{service.price}</div>
-                            <div className="bm-pay-step">4. Tap &quot;I&apos;ve Paid&quot; below</div>
+                                placeholder="Preferences, allergies, or special requests (optional)" rows="3" />
                         </div>
 
                         {errors.submit && <div className="submit-error">{errors.submit}</div>}
 
-                        <button className="btn-submit bm-btn-paid" onClick={handleConfirmPaid} disabled={loading}>
-                            {loading ? "Confirming..." : "✅ I've Paid — Confirm Booking"}
+                        <button type="submit" className="btn-submit" disabled={loading}>
+                            {loading
+                                ? "Reserving your slot…"
+                                : isPayAtSalon
+                                    ? "Confirm booking"
+                                    : `Continue to pay ₹${service.price}`}
                         </button>
-                        <button className="btn-back" onClick={() => setStep(1)} disabled={loading}>
-                            ← Back
-                        </button>
-                    </div>
+                    </form>
                 )}
 
-                {/* ── Step 3: Success ── */}
+                {step === 2 && (
+                    <PaymentStep
+                        service={service}
+                        bookingId={bookingId}
+                        upiSettings={upiSettings}
+                        onConfirm={handleConfirmPaid}
+                        onBack={() => setStep(1)}
+                        loading={loading}
+                        error={errors.submit}
+                    />
+                )}
+
                 {step === 3 && (
                     <div className="submit-success-full">
-                        <div className="success-icon-big">🎉</div>
-                        <h2>Booking Confirmed!</h2>
-                        <p>Thank you, <strong>{formData.customer_name}</strong>!</p>
+                        <div className="success-icon-big" aria-hidden>✓</div>
+                        <h2>{isPayAtSalon ? "Booking Confirmed!" : "Booking Reserved!"}</h2>
+                        <p>Thank you, <strong>{formData.customer_name}</strong></p>
+                        {bookingId && (
+                            <p className="bm-success-ref">
+                                Reference <strong>#{bookingId}</strong>
+                            </p>
+                        )}
                         <div className="bm-booking-summary">
                             <div><span>Service</span><strong>{service.name}</strong></div>
                             <div><span>Date</span><strong>{formData.booking_date}</strong></div>
-                            <div><span>Time</span><strong>{formData.booking_time}</strong></div>
+                            <div><span>Time</span><strong>{formatTime(formData.booking_time)}</strong></div>
                             <div><span>Branch</span><strong>{formData.branch}</strong></div>
-                            <div><span>Payment</span><strong className="bm-pending">Pending Verification</strong></div>
+                            <div><span>Payment</span><strong className={isPayAtSalon ? "bm-pay-at-salon" : "bm-pending"}>{successPaymentLabel}</strong></div>
                         </div>
                         <p className="bm-success-note">
-                            The salon will verify your payment and confirm your appointment shortly. 📱
+                            {isPayAtSalon
+                                ? `Please pay ₹${service.price} at the salon when you arrive. We've sent a confirmation to your phone${formData.customer_email ? " and email" : ""}.`
+                                : "We'll verify your UPI payment and confirm your appointment shortly. Check your phone for updates."}
                         </p>
-                        <button className="btn-submit" onClick={handleClose}>Close</button>
+                        {whatsappURLs?.customerURL && (
+                            <a
+                                href={whatsappURLs.customerURL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="bm-btn-whatsapp"
+                            >
+                                Share booking on WhatsApp
+                            </a>
+                        )}
+                        <button type="button" className="btn-submit" onClick={handleClose}>Done</button>
                     </div>
                 )}
             </div>
