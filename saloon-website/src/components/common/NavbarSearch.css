@@ -34,6 +34,68 @@
   color: #6b7a90;
 }
 
+/* Selected salon chip — inside the search bar (no layout shift) */
+.nsearch-inline-salon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 1;
+  max-width: 38%;
+  min-width: 0;
+  margin-right: 4px;
+  padding: 3px 4px 3px 8px;
+  border-radius: 999px;
+  background: #e8f0ff;
+  border: 1px solid #c5d8ff;
+  color: #1d4ed8;
+}
+
+.nsearch-inline-salon > svg {
+  flex-shrink: 0;
+  font-size: 11px;
+}
+
+.nsearch-inline-salon-name {
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1d4ed8;
+  cursor: pointer;
+}
+
+.nsearch-inline-salon-name:hover {
+  text-decoration: underline;
+}
+
+.nsearch-inline-salon-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #64748b;
+  font-size: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.nsearch-inline-salon-clear:hover {
+  background: rgba(29, 78, 216, 0.12);
+  color: #1d4ed8;
+}
+
 .nsearch-input {
   flex: 1;
   height: 100%;
@@ -280,6 +342,101 @@
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+/* Compact salon chip — shown after selection when dropdown is closed */
+.nsearch-pinned-compact {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 4px 8px 4px 6px;
+  max-width: 100%;
+  border-radius: 999px;
+  background: #f0f5ff;
+  border: 1px solid #d7e3ff;
+  font-size: 11px;
+  animation: nsd-appear 0.15s ease;
+}
+
+.nsearch-pinned-compact-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6f7f96;
+  flex-shrink: 0;
+}
+
+.nsearch-pinned-compact-name {
+  color: #13253f;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
+}
+
+.nsearch-pinned-compact-maps {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: #1d63d7;
+  background: #fff;
+  border: 1px solid #b8d0ff;
+  flex-shrink: 0;
+  text-decoration: none;
+  font-size: 11px;
+}
+
+.nsearch-pinned-compact-maps:hover {
+  background: #2874f0;
+  color: #fff;
+  border-color: #2874f0;
+}
+
+.nsearch-pinned-compact-change {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border: none;
+  border-radius: 999px;
+  background: #2874f0;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.nsearch-pinned-compact-change:hover {
+  background: #0f63ec;
+}
+
+.nsearch-pinned-compact-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #6f7f96;
+  font-size: 12px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.nsearch-pinned-compact-clear:hover {
+  color: #13253f;
+  background: rgba(0, 0, 0, 0.06);
 }
 
 .nsearch-pinned-bar {

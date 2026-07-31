@@ -988,24 +988,66 @@
     margin-bottom: 24px;
 }
 
+.bm-whatsapp-actions {
+    margin-bottom: 16px;
+    text-align: center;
+}
+
 .bm-btn-whatsapp {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
     padding: 14px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     font-size: var(--text-base);
     font-weight: var(--font-semibold);
     color: #fff;
     text-decoration: none;
     background: #128c7e;
+    border: none;
     border-radius: var(--radius-lg);
+    cursor: pointer;
     transition: opacity var(--duration-fast);
 }
 
 .bm-btn-whatsapp:hover {
     opacity: 0.92;
+}
+
+.bm-whatsapp-hint {
+    font-size: 12px;
+    color: var(--bm-text-muted);
+    margin: 0 0 12px;
+    line-height: 1.45;
+}
+
+.bm-whatsapp-split {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.bm-btn-whatsapp-secondary {
+    flex: 1;
+    min-width: 140px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    color: #25d366;
+    border: 1px solid rgba(37, 211, 102, 0.45);
+    border-radius: 10px;
+    background: rgba(37, 211, 102, 0.08);
+}
+
+.bm-btn-whatsapp-secondary:hover {
+    background: rgba(37, 211, 102, 0.16);
+}
+
+.bm-utr-section.has-error input {
+    border-color: #ff6b6b;
 }
 
 /* Inputs */

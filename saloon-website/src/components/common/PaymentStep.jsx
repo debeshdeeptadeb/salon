@@ -22,6 +22,7 @@ export default function PaymentStep({
     const [copied, setCopied] = useState(false);
     const [showRefHint, setShowRefHint] = useState(false);
     const [screenshotError, setScreenshotError] = useState("");
+    const [utrError, setUtrError] = useState("");
     const fileInputRef = useRef(null);
 
     const siteName = upiSettings?.site_name || "Salon";
@@ -100,20 +101,35 @@ export default function PaymentStep({
     };
 
     const handleConfirm = () => {
+        const utr = paymentRef.trim().replace(/\s/g, "");
+        let ok = true;
         if (!screenshot) {
             setScreenshotError("Please upload your payment screenshot to continue.");
+            ok = false;
+        }
+        if (utr.length < 8) {
+            setUtrError("Enter the UPI UTR / transaction ID from your payment (min. 8 characters).");
+            ok = false;
+        } else {
+            setUtrError("");
+        }
+        if (!ok) {
             fileInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
             return;
         }
         onConfirm({
-            paymentReference: paymentRef.trim() || undefined,
+            paymentReference: utr,
             screenshot,
         });
     };
 
     const qrSrc = qrDataUrl || (!qrError && staticQrUrl) || null;
     const hasPaymentMethod = Boolean(upiId || staticQrUrl);
-    const canConfirm = hasPaymentMethod && Boolean(screenshot) && !loading;
+    const canConfirm =
+        hasPaymentMethod &&
+        Boolean(screenshot) &&
+        paymentRef.trim().replace(/\s/g, "").length >= 8 &&
+        !loading;
 
     return (
         <div className="bm-payment">
@@ -146,9 +162,14 @@ export default function PaymentStep({
                 <div className="bm-qr-placeholder bm-qr-missing">
                     <div className="bm-qr-icon" aria-hidden>⚠️</div>
                     <p>
-                        Online payment is not configured yet.
+                        Online UPI payment is not set up for this salon yet.
                         <br />
-                        Please contact the salon to complete your booking.
+                        <strong>Admin:</strong> open <em>Site Settings → UPI payment QR</em>,
+                        add your UPI ID (and optional QR image), then Save.
+                        <br />
+                        <span style={{ opacity: 0.85 }}>
+                          (QR Codes page = marketing / booking link — not payment.)
+                        </span>
                     </p>
                 </div>
             ) : (
@@ -188,19 +209,26 @@ export default function PaymentStep({
                         </div>
                     </div>
 
+                    <div className="bm-pay-trust bm-verify-note">
+                        <span>
+                            Payment note includes <strong>Booking #{bookingId || "…"}</strong>.
+                            Enter the same UTR you see in GPay/PhonePe — our team matches amount + UTR in the salon UPI account before confirming.
+                        </span>
+                    </div>
+
                     <details className="bm-pay-help" open>
                         <summary>Step-by-step guide</summary>
                         <ol className="bm-pay-steps-list">
-                            <li>Tap <strong>Pay with UPI App</strong> or scan the QR code</li>
-                            <li>Confirm amount <strong>₹{displayAmount}</strong> in your app</li>
-                            <li>Take a screenshot of the success screen</li>
-                            <li>Upload your payment screenshot below (required)</li>
+                            <li>Tap <strong>Open UPI app</strong> or scan the QR (amount is pre-filled)</li>
+                            <li>Confirm amount <strong>₹{displayAmount}</strong> and pay</li>
+                            <li>Copy the <strong>UTR / Ref No.</strong> from the success screen</li>
+                            <li>Upload the success screenshot and paste the UTR below</li>
                         </ol>
                     </details>
 
-                    <div className="bm-card bm-utr-section">
+                    <div className={`bm-card bm-utr-section${utrError ? " has-error" : ""}`}>
                         <label htmlFor="payment_reference">
-                            UPI transaction reference <span className="bm-optional">optional</span>
+                            UPI transaction reference (UTR) <span className="bm-required">required</span>
                         </label>
                         <input
                             id="payment_reference"
@@ -209,7 +237,10 @@ export default function PaymentStep({
                             autoComplete="off"
                             placeholder="e.g. 123456789012"
                             value={paymentRef}
-                            onChange={(e) => setPaymentRef(e.target.value)}
+                            onChange={(e) => {
+                                setPaymentRef(e.target.value);
+                                if (utrError) setUtrError("");
+                            }}
                             maxLength={50}
                         />
                         <button
@@ -221,10 +252,12 @@ export default function PaymentStep({
                         </button>
                         {showRefHint && (
                             <p className="bm-utr-hint">
-                                After paying, open your UPI app → Transaction history → copy the 12-digit
-                                UTR / Reference ID.
+                                After paying: UPI app → Transaction history → open this payment →
+                                copy <strong>UTR / Reference No.</strong> (usually 12 digits).
+                                This is how we verify the payment is real and matches Booking #{bookingId}.
                             </p>
                         )}
+                        {utrError && <span className="bm-screenshot-error">{utrError}</span>}
                     </div>
 
                     <div className={`bm-card bm-screenshot-section${screenshotError ? " has-error" : ""}`}>

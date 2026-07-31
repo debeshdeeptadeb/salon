@@ -4,19 +4,26 @@ function inferApiBase() {
     const envUrl = import.meta.env.VITE_API_URL;
     if (envUrl) return envUrl;
 
+    // Local Vite: proxy /api → backend (see vite.config.js)
+    if (import.meta.env.DEV) return '/api';
+
     // In production, default to same-origin API to avoid "calling localhost" from users' browsers.
     if (import.meta.env.PROD && typeof window !== 'undefined' && window.location?.origin) {
         return `${window.location.origin}/api`;
     }
 
-    // Local dev fallback
     return 'http://localhost:5000/api';
 }
 
 const API_URL = inferApiBase();
 
-/** Backend origin for static files (e.g. /uploads). VITE_API_URL is the API base and often ends with /api. */
-export const API_ORIGIN = (API_URL || 'http://localhost:5000/api').replace(/\/?api\/?$/, '') || 'http://localhost:5000';
+/**
+ * Backend origin for static files (e.g. /uploads).
+ * In local Vite, use same-origin so /uploads is proxied to the backend.
+ */
+export const API_ORIGIN = import.meta.env.DEV
+    ? ''
+    : ((API_URL || 'http://localhost:5000/api').replace(/\/?api\/?$/, '') || 'http://localhost:5000');
 
 // Create axios instance
 const api = axios.create({

@@ -5,7 +5,6 @@ import {
   FaXmark,
   FaScissors,
   FaLocationDot,
-  FaMapLocationDot,
   FaStore,
 } from "react-icons/fa6";
 import { salonsAPI } from "../../services/api";
@@ -50,6 +49,7 @@ export default function NavbarSearch({ className = "" }) {
   const containerRef = useRef(null);
   const inputRef = useRef(null);
   const directoryLoadedRef = useRef(false);
+  const skipOpenOnFocusRef = useRef(false);
   const navigate = useNavigate();
 
   const resolvePinnedFromDirectory = useCallback((list) => {
@@ -76,15 +76,36 @@ export default function NavbarSearch({ className = "" }) {
     }
   }, [directory.length, resolvePinnedFromDirectory]);
 
+  // Resolve pinned salon name lightly on mount (no full directory wait for first paint)
   useEffect(() => {
-    loadDirectory();
-  }, [loadDirectory]);
+    let cancelled = false;
+    const slug = getStoredSalonSlug();
+    if (!hasExplicitSalonPick() || !slug) return;
+    // Prefer cached directory; otherwise fetch once in background
+    if (directory.length) {
+      resolvePinnedFromDirectory(directory);
+      return;
+    }
+    salonsAPI
+      .directory()
+      .then((res) => {
+        if (cancelled) return;
+        const list = res.data.data || [];
+        directoryLoadedRef.current = true;
+        setDirectory(list);
+        resolvePinnedFromDirectory(list);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: run once on mount / when slug pick changes
+  }, [explicitPick]);
 
   useEffect(() => {
     const sync = () => {
       setExplicitPick(hasExplicitSalonPick());
       if (directory.length) resolvePinnedFromDirectory(directory);
-      else loadDirectory();
     };
     window.addEventListener("publicSalonChanged", sync);
     window.addEventListener("storage", sync);
@@ -92,7 +113,7 @@ export default function NavbarSearch({ className = "" }) {
       window.removeEventListener("publicSalonChanged", sync);
       window.removeEventListener("storage", sync);
     };
-  }, [directory, resolvePinnedFromDirectory, loadDirectory]);
+  }, [directory, resolvePinnedFromDirectory]);
 
   useEffect(() => {
     const handler = (e) => {
@@ -193,6 +214,7 @@ export default function NavbarSearch({ className = "" }) {
   };
 
   const handleFocus = () => {
+    if (skipOpenOnFocusRef.current) return;
     setIsOpen(true);
     loadDirectory();
   };
@@ -218,6 +240,11 @@ export default function NavbarSearch({ className = "" }) {
     setQuery("");
     setResults([]);
     setHasSearched(false);
+    skipOpenOnFocusRef.current = true;
+    inputRef.current?.blur();
+    window.setTimeout(() => {
+      skipOpenOnFocusRef.current = false;
+    }, 250);
   };
 
   const openBooking = (service, salon) => {
@@ -282,7 +309,12 @@ export default function NavbarSearch({ className = "" }) {
             <button
               type="button"
               className="nsd-select-btn"
-              onClick={() => selectSalon(salon)}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                selectSalon(salon);
+              }}
               title={`Show ${salon.name} across the website`}
             >
               {isActive ? "Selected" : "Select salon"}
@@ -290,7 +322,12 @@ export default function NavbarSearch({ className = "" }) {
             <button
               type="button"
               className="nsd-view-btn"
-              onClick={() => goToServices(salon)}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                goToServices(salon);
+              }}
               title={`View all services at ${salon.name}`}
             >
               Services →
@@ -333,13 +370,36 @@ export default function NavbarSearch({ className = "" }) {
     );
   };
 
-  const pinnedAddress = pinnedSalon ? formatSalonAddress(pinnedSalon) : "";
-  const pinnedMapsUrl = pinnedSalon ? getSalonMapsUrl(pinnedSalon) : null;
-
   return (
     <div className={`nsearch-wrap${className ? ` ${className}` : ""}`} ref={containerRef}>
       <form className="nsearch-form" onSubmit={handleSubmit} role="search">
         <FaMagnifyingGlass className="nsearch-icon-left" aria-hidden />
+        {explicitPick && pinnedSalon && (
+          <span className="nsearch-inline-salon">
+            <FaStore aria-hidden />
+            <button
+              type="button"
+              className="nsearch-inline-salon-name"
+              onClick={() => {
+                setIsOpen(true);
+                loadDirectory();
+                window.setTimeout(() => inputRef.current?.focus(), 0);
+              }}
+              title="Change salon"
+            >
+              {pinnedSalon.name}
+            </button>
+            <button
+              type="button"
+              className="nsearch-inline-salon-clear"
+              onClick={clearPinnedSalon}
+              aria-label="Clear selected salon"
+              title="Clear salon"
+            >
+              <FaXmark />
+            </button>
+          </span>
+        )}
         <input
           ref={inputRef}
           type="search"
@@ -348,7 +408,7 @@ export default function NavbarSearch({ className = "" }) {
           onFocus={handleFocus}
           placeholder={
             pinnedSalon && explicitPick
-              ? `Search within ${pinnedSalon.name}…`
+              ? "Search services or another salon…"
               : "Search salon, location, service, or price…"
           }
           className="nsearch-input"
@@ -370,46 +430,6 @@ export default function NavbarSearch({ className = "" }) {
           Search
         </button>
       </form>
-
-      {explicitPick && pinnedSalon && (
-        <div className="nsearch-pinned-bar">
-          <FaStore className="nsearch-pinned-icon" aria-hidden />
-          <div className="nsearch-pinned-text">
-            <span className="nsearch-pinned-label">Viewing</span>
-            <strong>{pinnedSalon.name}</strong>
-            {pinnedAddress &&
-              (pinnedMapsUrl ? (
-                <a
-                  href={pinnedMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="nsearch-pinned-addr nsearch-pinned-addr-link"
-                  title="Open location in Google Maps"
-                >
-                  {pinnedAddress}
-                </a>
-              ) : (
-                <span className="nsearch-pinned-addr">{pinnedAddress}</span>
-              ))}
-          </div>
-          <div className="nsearch-pinned-actions">
-            {pinnedMapsUrl && (
-              <a
-                href={pinnedMapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="nsearch-pinned-maps"
-              >
-                <FaMapLocationDot aria-hidden />
-                Maps
-              </a>
-            )}
-            <button type="button" className="nsearch-pinned-clear" onClick={clearPinnedSalon}>
-              Default site
-            </button>
-          </div>
-        </div>
-      )}
 
       {isOpen && (
         <div className="nsearch-dropdown" role="listbox" aria-label="Salon search results">

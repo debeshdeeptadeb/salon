@@ -1,10 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import { FaMagnifyingGlass } from "react-icons/fa6";
-import "./Navbar.css";
-import defaultLogo from "../../assets/logo/minjal-salon-logo.svg";
-import { settingsAPI, API_ORIGIN } from "../../services/api";
+import { settingsAPI } from "../../services/api";
+import { resolveMediaUrl } from "../../utils/mediaUrl";
 import NavbarSearch from "./NavbarSearch";
+import defaultLogo from "../../assets/logo/minjal-salon-logo.svg";
+import "./Navbar.css";
 
 export default function Navbar() {
   const location = useLocation();
@@ -27,11 +28,7 @@ export default function Navbar() {
       const response = await settingsAPI.getSettings();
       const data = response.data.data;
       if (data.navbar_logo_url) {
-        setLogo(
-          data.navbar_logo_url.startsWith('http')
-            ? data.navbar_logo_url
-            : `${API_ORIGIN}${data.navbar_logo_url}`
-        );
+        setLogo(resolveMediaUrl(data.navbar_logo_url) || defaultLogo);
       } else {
         setLogo(defaultLogo);
       }

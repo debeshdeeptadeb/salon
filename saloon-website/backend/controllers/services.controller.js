@@ -107,9 +107,23 @@ export const updateService = async (req, res, next) => {
             return res.status(400).json({ success: false, error: 'Invalid category for this salon' });
         }
 
-        let image_url = req.body.image_url;
+        const existing = await pool.query(
+            'SELECT image_url FROM services WHERE id = $1 AND salon_id = $2',
+            [req.params.id, salonId]
+        );
+        if (existing.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                error: 'Service not found'
+            });
+        }
+
+        // Keep existing image unless a new file is uploaded
+        let image_url = existing.rows[0].image_url;
         if (req.file) {
             image_url = `/uploads/${req.file.filename}`;
+        } else if (req.body.image_url !== undefined && req.body.image_url !== '') {
+            image_url = req.body.image_url;
         }
 
         const result = await pool.query(
@@ -119,15 +133,19 @@ export const updateService = async (req, res, next) => {
            updated_at = CURRENT_TIMESTAMP
        WHERE id = $9 AND salon_id = $10
        RETURNING *`,
-            [category_id, name, description, price, duration, image_url, is_featured, is_active, req.params.id, salonId]
+            [
+                category_id,
+                name,
+                description,
+                price,
+                duration,
+                image_url,
+                is_featured === true || is_featured === 'true',
+                is_active === undefined ? true : (is_active === true || is_active === 'true'),
+                req.params.id,
+                salonId,
+            ]
         );
-
-        if (result.rows.length === 0) {
-            return res.status(404).json({
-                success: false,
-                error: 'Service not found'
-            });
-        }
 
         res.status(200).json({
             success: true,

@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
-import { servicesAPI, API_ORIGIN } from "../services/api";
+import { servicesAPI } from "../services/api";
+import { resolveMediaUrl } from "../utils/mediaUrl";
 import BookingModal from "../components/common/BookingModal";
 import "./Services.css";
 import { useOnPublicSalonChange } from "../hooks/useOnPublicSalonChange";
@@ -108,9 +109,13 @@ export default function Services() {
                 {service.image_url && (
                   <div className="service-image">
                     <img
-                      src={`${API_ORIGIN}${service.image_url}`}
+                      src={resolveMediaUrl(service.image_url)}
                       alt={service.name}
                       loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                        e.currentTarget.parentElement?.classList.add("service-image--missing");
+                      }}
                     />
                     <div className="service-overlay"></div>
                   </div>

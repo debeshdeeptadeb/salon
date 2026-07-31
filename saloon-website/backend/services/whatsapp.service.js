@@ -1,136 +1,113 @@
 /**
  * WhatsApp Notification Service
- * Uses WhatsApp Web URL approach to send notifications
+ * Uses WhatsApp Web / wa.me deep links (user taps Send).
+ * Set ADMIN_WHATSAPP in env (digits with country code, e.g. 917008085336).
  */
 
-const ADMIN_PHONE = '917008085336'; // Admin WhatsApp number
+const ADMIN_PHONE = (process.env.ADMIN_WHATSAPP || '917008085336').replace(/\D/g, '');
 
-/**
- * Format phone number for WhatsApp (remove spaces, dashes, add country code if needed)
- */
 const formatPhoneNumber = (phone) => {
-    // Remove all non-numeric characters
-    let cleaned = phone.replace(/\D/g, '');
-
-    // Add country code if not present
+    let cleaned = String(phone || '').replace(/\D/g, '');
     if (!cleaned.startsWith('91') && cleaned.length === 10) {
-        cleaned = '91' + cleaned;
+        cleaned = `91${cleaned}`;
     }
-
     return cleaned;
 };
 
-/**
- * Format date for display
- */
 const formatDate = (date) => {
     const d = new Date(date);
     return d.toLocaleDateString('en-IN', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
     });
 };
 
-/**
- * Format time for display
- */
 const formatTime = (time) => {
-    const [hours, minutes] = time.split(':');
-    const hour = parseInt(hours);
+    const [hours, minutes] = String(time).split(':');
+    const hour = parseInt(hours, 10);
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const displayHour = hour % 12 || 12;
     return `${displayHour}:${minutes} ${ampm}`;
 };
 
-/**
- * Generate WhatsApp message for admin notification
- */
+const paymentLines = (booking) => {
+    const method = booking.payment_method || 'upi_online';
+    const status = booking.payment_status || 'pending';
+    const utr = booking.payment_reference?.trim();
+    if (method === 'pay_at_salon' || status === 'pay_at_salon') {
+        return `💳 Payment: Pay at salon`;
+    }
+    let line = `💳 Payment: Online UPI (${status})`;
+    if (utr) line += `\n🔢 UTR / Ref: ${utr}`;
+    line += `\n📌 Verify note in UPI should include: Booking ${booking.id}`;
+    return line;
+};
+
 export const generateAdminMessage = (booking) => {
-    const message = `🎉 *NEW BOOKING RECEIVED*
+    const message = `🆕 *NEW BOOKING #${booking.id}*
 
-📋 *Booking Details:*
-━━━━━━━━━━━━━━━━━━━━
-👤 Customer: ${booking.customer_name}
-📱 Phone: ${booking.customer_phone}
-${booking.customer_email ? `📧 Email: ${booking.customer_email}\n` : ''}
-💇 Service: ${booking.service_name}
-💰 Price: ₹${booking.service_price}
-📅 Date: ${formatDate(booking.booking_date)}
-⏰ Time: ${formatTime(booking.booking_time)}
-🏢 Branch: ${booking.branch}
-${booking.notes ? `📝 Notes: ${booking.notes}\n` : ''}
-━━━━━━━━━━━━━━━━━━━━
+👤 ${booking.customer_name}
+📱 ${booking.customer_phone}
+${booking.customer_email ? `📧 ${booking.customer_email}\n` : ''}💇 ${booking.service_name}
+💰 ₹${booking.service_price}
+📅 ${formatDate(booking.booking_date)}
+⏰ ${formatTime(booking.booking_time)}
+🏢 ${booking.branch}
+${booking.notes ? `📝 ${booking.notes}\n` : ''}
+${paymentLines(booking)}
 
-🆔 Booking ID: #${booking.id}
-📊 Status: ${booking.status.toUpperCase()}
-
-Please confirm this booking at your earliest convenience.`;
+Please verify payment (UTR + amount) in your UPI app, then mark Paid / Confirmed in Admin → Bookings.`;
 
     return encodeURIComponent(message);
 };
 
-/**
- * Generate WhatsApp message for customer confirmation
- */
 export const generateCustomerMessage = (booking) => {
-    const message = `✨ *BOOKING CONFIRMATION*
+    const payNote =
+        booking.payment_method === 'pay_at_salon' || booking.payment_status === 'pay_at_salon'
+            ? `Please pay ₹${booking.service_price} at the salon when you arrive.`
+            : `Payment submitted for verification. Keep UTR handy. Booking note: #${booking.id}`;
 
-Dear ${booking.customer_name},
+    const message = `✨ *BOOKING #${booking.id}*
 
-Thank you for choosing Minjal Salon! Your appointment has been successfully booked.
+Hi ${booking.customer_name},
 
-📋 *Your Appointment Details:*
-━━━━━━━━━━━━━━━━━━━━
-💇 Service: ${booking.service_name}
-💰 Price: ₹${booking.service_price}
-📅 Date: ${formatDate(booking.booking_date)}
-⏰ Time: ${formatTime(booking.booking_time)}
-🏢 Branch: ${booking.branch}
-━━━━━━━━━━━━━━━━━━━━
+Your appointment is reserved.
 
-🆔 Booking Reference: #${booking.id}
+💇 ${booking.service_name}
+💰 ₹${booking.service_price}
+📅 ${formatDate(booking.booking_date)}
+⏰ ${formatTime(booking.booking_time)}
+🏢 ${booking.branch}
 
-We look forward to serving you! If you need to reschedule or have any questions, please contact us.
+${payNote}
 
-Best regards,
-*Minjal Salon Team* 💈`;
+Thank you!`;
 
     return encodeURIComponent(message);
 };
 
-/**
- * Get WhatsApp URL for admin notification
- */
 export const getAdminWhatsAppURL = (booking) => {
-    const message = generateAdminMessage(booking);
-    return `https://wa.me/${ADMIN_PHONE}?text=${message}`;
+    if (!ADMIN_PHONE) return null;
+    return `https://wa.me/${ADMIN_PHONE}?text=${generateAdminMessage(booking)}`;
 };
 
-/**
- * Get WhatsApp URL for customer confirmation
- */
 export const getCustomerWhatsAppURL = (booking) => {
     const phone = formatPhoneNumber(booking.customer_phone);
-    const message = generateCustomerMessage(booking);
-    return `https://wa.me/${phone}?text=${message}`;
+    if (!phone) return null;
+    return `https://wa.me/${phone}?text=${generateCustomerMessage(booking)}`;
 };
 
-/**
- * Generate both WhatsApp URLs for a booking
- */
-export const generateWhatsAppURLs = (booking) => {
-    return {
-        adminURL: getAdminWhatsAppURL(booking),
-        customerURL: getCustomerWhatsAppURL(booking)
-    };
-};
+export const generateWhatsAppURLs = (booking) => ({
+    adminURL: getAdminWhatsAppURL(booking),
+    customerURL: getCustomerWhatsAppURL(booking),
+});
 
 export default {
     generateAdminMessage,
     generateCustomerMessage,
     getAdminWhatsAppURL,
     getCustomerWhatsAppURL,
-    generateWhatsAppURLs
+    generateWhatsAppURLs,
 };

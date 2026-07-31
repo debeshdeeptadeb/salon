@@ -432,11 +432,19 @@ export const confirmPayment = async (req, res, next) => {
         const ref = payment_reference?.trim().slice(0, 50) || null;
         const screenshotUrl = req.file ? `/uploads/payments/${req.file.filename}` : null;
 
-        if (row.payment_method !== 'pay_at_salon' && !screenshotUrl && !row.payment_screenshot_url) {
-            return res.status(400).json({
-                success: false,
-                error: 'Payment screenshot is required. Please upload your UPI payment proof.',
-            });
+        if (row.payment_method !== 'pay_at_salon') {
+            if (!screenshotUrl && !row.payment_screenshot_url) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Payment screenshot is required. Please upload your UPI payment proof.',
+                });
+            }
+            if (!ref || ref.replace(/\s/g, '').length < 8) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Enter a valid UPI UTR / transaction reference (at least 8 characters).',
+                });
+            }
         }
 
         const result = await pool.query(
@@ -459,9 +467,16 @@ export const confirmPayment = async (req, res, next) => {
 
         notifyPaymentSubmitted(booking, service, salonName).catch(() => {});
 
+        const bookingWithService = {
+            ...booking,
+            service_name: row.service_name,
+            service_price: row.service_price,
+        };
+
         res.status(200).json({
             success: true,
             data: booking,
+            whatsappURLs: generateWhatsAppURLs(bookingWithService),
         });
     } catch (error) {
         next(error);

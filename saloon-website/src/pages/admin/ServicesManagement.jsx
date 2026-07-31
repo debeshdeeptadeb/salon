@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { HiOutlinePlus, HiOutlineStar, HiOutlineMinusSmall } from 'react-icons/hi2';
-import { servicesAPI, API_ORIGIN } from '../../services/api';
+import { servicesAPI } from '../../services/api';
+import { resolveMediaUrl } from '../../utils/mediaUrl';
 import { toast } from 'react-toastify';
 
 export default function ServicesManagement() {
@@ -53,6 +54,8 @@ export default function ServicesManagement() {
 
         if (imageFile) {
             data.append('image', imageFile);
+        } else if (editingService?.image_url) {
+            data.append('image_url', editingService.image_url);
         }
 
         try {
@@ -157,7 +160,7 @@ export default function ServicesManagement() {
                             <td>
                                 {service.image_url && (
                                     <img
-                                        src={`${API_ORIGIN}${service.image_url}`}
+                                        src={resolveMediaUrl(service.image_url)}
                                         alt={service.name}
                                         style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px' }}
                                     />

@@ -168,7 +168,8 @@ export default function BookingModal({ isOpen, onClose, service }) {
             if (paymentReference) payload.append("payment_reference", paymentReference);
             if (screenshot) payload.append("payment_screenshot", screenshot);
 
-            await bookingsAPI.confirmPayment(bookingId, payload);
+            const res = await bookingsAPI.confirmPayment(bookingId, payload);
+            if (res?.data?.whatsappURLs) setWhatsappURLs(res.data.whatsappURLs);
             setStep(3);
         } catch (err) {
             const msg =
@@ -444,18 +445,54 @@ export default function BookingModal({ isOpen, onClose, service }) {
                         </div>
                         <p className="bm-success-note">
                             {isPayAtSalon
-                                ? `Please pay ₹${service.price} at the salon when you arrive. We've sent a confirmation to your phone${formData.customer_email ? " and email" : ""}.`
-                                : "We'll verify your UPI payment and confirm your appointment shortly. Check your phone for updates."}
+                                ? `Please pay ₹${service.price} at the salon when you arrive.`
+                                : "We'll verify your UPI payment (UTR + amount in our account) and confirm shortly."}
                         </p>
-                        {whatsappURLs?.customerURL && (
-                            <a
-                                href={whatsappURLs.customerURL}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="bm-btn-whatsapp"
-                            >
-                                Share booking on WhatsApp
-                            </a>
+                        {(whatsappURLs?.adminURL || whatsappURLs?.customerURL) && (
+                            <div className="bm-whatsapp-actions">
+                                <button
+                                    type="button"
+                                    className="bm-btn-whatsapp"
+                                    onClick={() => {
+                                        // Open salon chat first, then customer (tap Send in each)
+                                        if (whatsappURLs.adminURL) {
+                                            window.open(whatsappURLs.adminURL, "_blank", "noopener,noreferrer");
+                                        }
+                                        if (whatsappURLs.customerURL) {
+                                            window.setTimeout(() => {
+                                                window.open(whatsappURLs.customerURL, "_blank", "noopener,noreferrer");
+                                            }, 1500);
+                                        }
+                                    }}
+                                >
+                                    Notify salon &amp; me on WhatsApp
+                                </button>
+                                <p className="bm-whatsapp-hint">
+                                    WhatsApp opens twice — first to the salon, then your chat. Tap <strong>Send</strong> in each.
+                                </p>
+                                <div className="bm-whatsapp-split">
+                                    {whatsappURLs.adminURL && (
+                                        <a
+                                            href={whatsappURLs.adminURL}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="bm-btn-whatsapp-secondary"
+                                        >
+                                            Notify salon only
+                                        </a>
+                                    )}
+                                    {whatsappURLs.customerURL && (
+                                        <a
+                                            href={whatsappURLs.customerURL}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="bm-btn-whatsapp-secondary"
+                                        >
+                                            My confirmation
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
                         )}
                         <button type="button" className="btn-submit" onClick={handleClose}>Done</button>
                     </div>
