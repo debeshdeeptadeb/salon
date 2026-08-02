@@ -2,7 +2,13 @@ import { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import { settingsAPI, bookingsAPI } from "../../services/api";
 import PaymentStep from "./PaymentStep";
-import { generateTimeSlots } from "../../utils/bookingSlots";
+import {
+    formatTimeLabel,
+    getMinBookingDate,
+    getSelectableSlots,
+    isDateInPast,
+    isSlotInPast,
+} from "../../utils/bookingSlots";
 import "./BookingModal.css";
 
 export default function BookingModal({ isOpen, onClose, service }) {
@@ -25,9 +31,21 @@ export default function BookingModal({ isOpen, onClose, service }) {
     const [whatsappURLs, setWhatsappURLs] = useState(null);
     const [bookedTimes, setBookedTimes] = useState([]);
     const [loadingSlots, setLoadingSlots] = useState(false);
+    const [nowTick, setNowTick] = useState(() => Date.now());
 
     const branches = ["Cuttack", "Bhubaneswar", "Baripada"];
-    const allTimeSlots = useMemo(() => generateTimeSlots(), []);
+    const serviceDuration = Number(service?.duration) || 30;
+
+    const timeSlots = useMemo(
+        () => getSelectableSlots(formData.booking_date, bookedTimes, new Date(nowTick)),
+        [formData.booking_date, bookedTimes, nowTick]
+    );
+
+    useEffect(() => {
+        if (!isOpen) return undefined;
+        const id = window.setInterval(() => setNowTick(Date.now()), 60_000);
+        return () => window.clearInterval(id);
+    }, [isOpen]);
 
     useEffect(() => {
         if (!isOpen || !service?.id) return;
@@ -38,6 +56,7 @@ export default function BookingModal({ isOpen, onClose, service }) {
         setBookingId(null);
         setWhatsappURLs(null);
         setBookedTimes([]);
+        setNowTick(Date.now());
         setFormData({
             customer_name: "",
             customer_phone: "",
@@ -54,7 +73,7 @@ export default function BookingModal({ isOpen, onClose, service }) {
     }, [isOpen, service?.id]);
 
     useEffect(() => {
-        if (!formData.booking_date || !formData.branch) {
+        if (!formData.booking_date || !formData.branch || !service?.id) {
             setBookedTimes([]);
             return;
         }
@@ -62,7 +81,11 @@ export default function BookingModal({ isOpen, onClose, service }) {
         let cancelled = false;
         setLoadingSlots(true);
         bookingsAPI
-            .getAvailability({ date: formData.booking_date, branch: formData.branch })
+            .getAvailability({
+                date: formData.booking_date,
+                branch: formData.branch,
+                duration: serviceDuration,
+            })
             .then((res) => {
                 if (!cancelled) setBookedTimes(res.data.data?.bookedTimes || []);
             })
@@ -76,29 +99,39 @@ export default function BookingModal({ isOpen, onClose, service }) {
         return () => {
             cancelled = true;
         };
-    }, [formData.booking_date, formData.branch]);
+    }, [formData.booking_date, formData.branch, service?.id, serviceDuration]);
 
     useEffect(() => {
-        if (formData.booking_time && bookedTimes.includes(formData.booking_time)) {
+        if (!formData.booking_time) return;
+        const selected = timeSlots.find((s) => s.value === formData.booking_time);
+        if (selected?.disabled) {
             setFormData((prev) => ({ ...prev, booking_time: "" }));
         }
-    }, [bookedTimes, formData.booking_time]);
+    }, [timeSlots, formData.booking_time]);
 
-    const formatTime = (time) => {
-        const [hours, minutes] = time.split(":");
-        const hour = parseInt(hours, 10);
-        const ampm = hour >= 12 ? "PM" : "AM";
-        const displayHour = hour % 12 || 12;
-        return `${displayHour}:${minutes} ${ampm}`;
-    };
-
-    const getMinDate = () => new Date().toISOString().split("T")[0];
+    const formatTime = (time) => formatTimeLabel(time);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        setFormData((prev) => {
+            const next = { ...prev, [name]: value };
+            if (name === "booking_date" || name === "branch") {
+                next.booking_time = "";
+            }
+            return next;
+        });
         if (errors[name]) {
             setErrors((prev) => ({ ...prev, [name]: "" }));
+        }
+        if (name === "booking_date" || name === "branch") {
+            setErrors((prev) => ({ ...prev, booking_time: "" }));
+        }
+    };
+
+    const selectTime = (value) => {
+        setFormData((prev) => ({ ...prev, booking_time: value }));
+        if (errors.booking_time) {
+            setErrors((prev) => ({ ...prev, booking_time: "" }));
         }
     };
 
@@ -111,9 +144,13 @@ export default function BookingModal({ isOpen, onClose, service }) {
         if (formData.customer_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customer_email))
             newErrors.customer_email = "Please enter a valid email address";
         if (!formData.booking_date) newErrors.booking_date = "Date is required";
-        if (!formData.booking_time) newErrors.booking_time = "Time is required";
+        else if (isDateInPast(formData.booking_date))
+            newErrors.booking_date = "Please choose today or a future date";
         if (!formData.branch) newErrors.branch = "Branch is required";
-        if (bookedTimes.includes(formData.booking_time))
+        if (!formData.booking_time) newErrors.booking_time = "Time is required";
+        else if (isSlotInPast(formData.booking_date, formData.booking_time))
+            newErrors.booking_time = "Please choose a future time slot";
+        else if (bookedTimes.includes(formData.booking_time))
             newErrors.booking_time = "This slot was just booked. Please pick another time.";
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -356,7 +393,7 @@ export default function BookingModal({ isOpen, onClose, service }) {
                                 <label htmlFor="booking_date">Date <span className="required">*</span></label>
                                 <input type="date" id="booking_date" name="booking_date"
                                     value={formData.booking_date} onChange={handleChange}
-                                    min={getMinDate()} className={errors.booking_date ? "error" : ""} />
+                                    min={getMinBookingDate()} className={errors.booking_date ? "error" : ""} />
                                 {errors.booking_date && <span className="error-message">{errors.booking_date}</span>}
                             </div>
                             <div className="form-group">
@@ -372,27 +409,54 @@ export default function BookingModal({ isOpen, onClose, service }) {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="booking_time">Time <span className="required">*</span></label>
-                            <select id="booking_time" name="booking_time"
-                                value={formData.booking_time} onChange={handleChange}
-                                className={errors.booking_time ? "error" : ""}
-                                disabled={!formData.booking_date || !formData.branch}>
-                                <option value="">
-                                    {!formData.booking_date || !formData.branch
-                                        ? "Select date and branch first"
-                                        : loadingSlots
-                                            ? "Loading slots…"
-                                            : "Select time"}
-                                </option>
-                                {allTimeSlots.map((slot) => {
-                                    const taken = bookedTimes.includes(slot.value);
-                                    return (
-                                        <option key={slot.value} value={slot.value} disabled={taken}>
-                                            {slot.label}{taken ? " — Booked" : ""}
-                                        </option>
-                                    );
-                                })}
-                            </select>
+                            <label id="booking_time_label">
+                                Time <span className="required">*</span>
+                                <span className="bm-label-hint">
+                                    {serviceDuration}-min session · 30-min slots
+                                </span>
+                            </label>
+                            {!formData.booking_date || !formData.branch ? (
+                                <p className="bm-slots-placeholder">Select date and branch to see available times</p>
+                            ) : loadingSlots ? (
+                                <p className="bm-slots-placeholder">Checking availability…</p>
+                            ) : (
+                                <>
+                                    <div
+                                        className={`bm-slot-grid${errors.booking_time ? " has-error" : ""}`}
+                                        role="listbox"
+                                        aria-labelledby="booking_time_label"
+                                    >
+                                        {timeSlots.map((slot) => (
+                                            <button
+                                                key={slot.value}
+                                                type="button"
+                                                role="option"
+                                                aria-selected={formData.booking_time === slot.value}
+                                                aria-disabled={slot.disabled}
+                                                disabled={slot.disabled}
+                                                className={`bm-slot-chip bm-slot-chip--${slot.status}${
+                                                    formData.booking_time === slot.value ? " selected" : ""
+                                                }`}
+                                                onClick={() => selectTime(slot.value)}
+                                                title={
+                                                    slot.past
+                                                        ? "This time has passed"
+                                                        : slot.taken
+                                                            ? "Already booked"
+                                                            : `Book ${slot.label}`
+                                                }
+                                            >
+                                                {slot.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="bm-slot-legend" aria-hidden>
+                                        <span><i className="bm-dot available" /> Available</span>
+                                        <span><i className="bm-dot booked" /> Booked</span>
+                                        <span><i className="bm-dot past" /> Past</span>
+                                    </div>
+                                </>
+                            )}
                             {errors.booking_time && <span className="error-message">{errors.booking_time}</span>}
                         </div>
 

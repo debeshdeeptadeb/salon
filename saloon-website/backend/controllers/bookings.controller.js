@@ -1,32 +1,51 @@
 import pool from '../config/database.js';
 import { generateWhatsAppURLs } from '../services/whatsapp.service.js';
 import { notifyBookingCreated, notifyPaymentSubmitted } from '../services/notification.service.js';
+import {
+    normalizeTime,
+    isBookingInPast,
+    slotsOverlap,
+    buildUnavailableStarts,
+    SLOT_INTERVAL_MINUTES,
+} from '../utils/bookingSlots.js';
 
 const VALID_PAYMENT_METHODS = ['upi_online', 'pay_at_salon'];
 const VALID_PAYMENT_STATUSES = ['pending', 'paid', 'pay_at_salon'];
 
-function normalizeTime(timeStr) {
-    const [h, m] = String(timeStr).split(':');
-    return `${h.padStart(2, '0')}:${(m || '00').padStart(2, '0')}`;
-}
-
-async function isSlotTaken(salonId, bookingDate, bookingTime, branch, excludeBookingId = null) {
-    const params = [salonId, bookingDate, normalizeTime(bookingTime), branch];
+async function getActiveBookingsForDay(salonId, bookingDate, branch, excludeBookingId = null) {
+    const params = [salonId, bookingDate, branch];
     let query = `
-        SELECT id FROM bookings
-        WHERE salon_id = $1
-          AND booking_date = $2
-          AND booking_time::text LIKE $3 || '%'
-          AND branch = $4
-          AND status != 'cancelled'
+        SELECT b.id,
+               b.booking_time::text AS booking_time,
+               COALESCE(s.duration, ${SLOT_INTERVAL_MINUTES}) AS duration
+        FROM bookings b
+        LEFT JOIN services s ON s.id = b.service_id
+        WHERE b.salon_id = $1
+          AND b.booking_date = $2
+          AND b.branch = $3
+          AND b.status != 'cancelled'
     `;
     if (excludeBookingId) {
-        query += ' AND id != $5';
+        query += ' AND b.id != $4';
         params.push(excludeBookingId);
     }
-    query += ' LIMIT 1';
     const result = await pool.query(query, params);
-    return result.rows.length > 0;
+    return result.rows.map((row) => {
+        const t = row.booking_time;
+        return {
+            id: row.id,
+            booking_time: normalizeTime(t.length > 5 ? t.slice(0, 5) : t),
+            duration: Number(row.duration) || SLOT_INTERVAL_MINUTES,
+        };
+    });
+}
+
+/** True if requested window overlaps any active booking at this salon/branch/date. */
+async function isSlotTaken(salonId, bookingDate, bookingTime, branch, durationMins, excludeBookingId = null) {
+    const existing = await getActiveBookingsForDay(salonId, bookingDate, branch, excludeBookingId);
+    const start = normalizeTime(bookingTime);
+    const duration = Number(durationMins) || SLOT_INTERVAL_MINUTES;
+    return existing.some((b) => slotsOverlap(start, duration, b.booking_time, b.duration));
 }
 
 async function getSalonName(salonId) {
@@ -42,7 +61,7 @@ async function getSalonName(salonId) {
 export const getAvailability = async (req, res, next) => {
     try {
         const salonId = req.publicSalonId;
-        const { date, branch } = req.query;
+        const { date, branch, duration } = req.query;
 
         if (!date || !branch) {
             return res.status(400).json({
@@ -51,24 +70,20 @@ export const getAvailability = async (req, res, next) => {
             });
         }
 
-        const result = await pool.query(
-            `SELECT booking_time::text AS booking_time
-             FROM bookings
-             WHERE salon_id = $1
-               AND booking_date = $2
-               AND branch = $3
-               AND status != 'cancelled'`,
-            [salonId, date, branch]
+        const requestedDuration = Math.max(
+            SLOT_INTERVAL_MINUTES,
+            parseInt(duration, 10) || SLOT_INTERVAL_MINUTES
         );
-
-        const bookedTimes = result.rows.map((row) => {
-            const t = row.booking_time;
-            return normalizeTime(t.length > 5 ? t.slice(0, 5) : t);
-        });
+        const existing = await getActiveBookingsForDay(salonId, date, branch);
+        const bookedTimes = buildUnavailableStarts(existing, requestedDuration);
 
         res.status(200).json({
             success: true,
-            data: { bookedTimes: [...new Set(bookedTimes)] },
+            data: {
+                bookedTimes,
+                slotIntervalMinutes: SLOT_INTERVAL_MINUTES,
+                requestedDuration,
+            },
         });
     } catch (error) {
         next(error);
@@ -129,16 +144,16 @@ export const createBooking = async (req, res, next) => {
             });
         }
 
-        const slotTaken = await isSlotTaken(salonId, booking_date, booking_time, resolvedBranch);
-        if (slotTaken) {
-            return res.status(409).json({
+        const normalizedTime = normalizeTime(booking_time);
+        if (isBookingInPast(booking_date, normalizedTime)) {
+            return res.status(400).json({
                 success: false,
-                error: 'This time slot is no longer available. Please choose another time.',
+                error: 'Please choose a future date and time for your booking.',
             });
         }
 
         const serviceCheck = await pool.query(
-            'SELECT id, name, price FROM services WHERE id = $1 AND is_active = true AND salon_id = $2',
+            'SELECT id, name, price, duration FROM services WHERE id = $1 AND is_active = true AND salon_id = $2',
             [service_id, salonId]
         );
 
@@ -150,6 +165,21 @@ export const createBooking = async (req, res, next) => {
         }
 
         const service = serviceCheck.rows[0];
+        const serviceDuration = Number(service.duration) || SLOT_INTERVAL_MINUTES;
+
+        const slotTaken = await isSlotTaken(
+            salonId,
+            booking_date,
+            normalizedTime,
+            resolvedBranch,
+            serviceDuration
+        );
+        if (slotTaken) {
+            return res.status(409).json({
+                success: false,
+                error: 'This time slot is no longer available. Please choose another time.',
+            });
+        }
 
         let finalPaymentStatus = payment_status || 'pending';
         if (resolvedPaymentMethod === 'pay_at_salon') {
@@ -158,26 +188,37 @@ export const createBooking = async (req, res, next) => {
             finalPaymentStatus = 'pending';
         }
 
-        const result = await pool.query(
-            `INSERT INTO bookings 
-            (salon_id, customer_name, customer_phone, customer_email, service_id, booking_date, booking_time, branch, notes, status, qr_source_id, payment_status, payment_method)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending', $10, $11, $12)
-            RETURNING *`,
-            [
-                salonId,
-                customer_name,
-                customer_phone,
-                customer_email || null,
-                service_id,
-                booking_date,
-                booking_time,
-                resolvedBranch,
-                notes || null,
-                qr_source_id || null,
-                finalPaymentStatus,
-                resolvedPaymentMethod,
-            ]
-        );
+        let result;
+        try {
+            result = await pool.query(
+                `INSERT INTO bookings 
+                (salon_id, customer_name, customer_phone, customer_email, service_id, booking_date, booking_time, branch, notes, status, qr_source_id, payment_status, payment_method)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending', $10, $11, $12)
+                RETURNING *`,
+                [
+                    salonId,
+                    customer_name,
+                    customer_phone,
+                    customer_email || null,
+                    service_id,
+                    booking_date,
+                    normalizedTime,
+                    resolvedBranch,
+                    notes || null,
+                    qr_source_id || null,
+                    finalPaymentStatus,
+                    resolvedPaymentMethod,
+                ]
+            );
+        } catch (err) {
+            if (err.code === '23505') {
+                return res.status(409).json({
+                    success: false,
+                    error: 'This time slot is no longer available. Please choose another time.',
+                });
+            }
+            throw err;
+        }
 
         const booking = result.rows[0];
         const salonName = await getSalonName(salonId);
